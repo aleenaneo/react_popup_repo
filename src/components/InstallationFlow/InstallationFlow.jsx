@@ -155,23 +155,6 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
       case 'intro':
         return (
           <div className="intro-step">
-            <div className="intro-header">
-              <img 
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Nextbase_logo.svg/2560px-Nextbase_logo.svg.png" 
-                alt="NEXTBASE" 
-                className="intro-logo" 
-              />
-              <p>
-                Take the hassle out of installation and have your new Nextbase Dash Cam installed by our partners and their trained engineers at a time and location of your choice (Hardwire Kit included). <a href="#" className="read-more-link">Read more</a>
-              </p>
-            </div>
-
-            <ProductBox
-              product={product}
-              installationProduct={installationProduct}
-              onToggleInstallation={setIncludeInstallation}
-            />
-
             {error && <div className="error-banner">{error}</div>}
 
             <div className="intro-actions">
@@ -236,7 +219,30 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="">
       <div className="installation-flow">
-        {renderStep()}
+        {/* Persistent Header Section - Visible across ALL steps */}
+        <div className="flow-header-section">
+          <div className="intro-header">
+            <img 
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Nextbase_logo.svg/2560px-Nextbase_logo.svg.png" 
+              alt="NEXTBASE" 
+              className="intro-logo" 
+            />
+            <p>
+              Take the hassle out of installation and have your new Nextbase Dash Cam installed by our partners and their trained engineers at a time and location of your choice (Hardwire Kit included). <a href="#" className="read-more-link">Read more</a>
+            </p>
+          </div>
+
+          <ProductBox
+            product={product}
+            installationProduct={installationProduct}
+            onToggleInstallation={setIncludeInstallation}
+          />
+        </div>
+
+        {/* Dynamic Step Content */}
+        <div className="flow-content-section">
+          {renderStep()}
+        </div>
       </div>
     </Modal>
   );

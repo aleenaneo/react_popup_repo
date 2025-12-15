@@ -1,12 +1,21 @@
 .installation-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 0 10px;
     min-height: 300px;
 }
 
-/* Intro Step */
-.intro-step {
+.flow-header-section {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 16px;
+    /* border-bottom: 1px solid #e9ecef; */
+    /* padding-bottom: 24px; */
+}
+
+.flow-content-section {
+    animation: fadeIn 0.3s ease-in-out;
 }
 
 .intro-header {
@@ -53,8 +62,8 @@
 
 .btn-outline {
     background: white;
-    color: #007bff;
-    border: 2px solid #007bff;
+    color: #6317ff;
+    border: 2px solid #6317ff;
     padding: 14px 28px;
     border-radius: 8px;
     font-size: 16px;
@@ -64,9 +73,9 @@
 }
 
 .btn-outline:hover:not(:disabled) {
-    background: #007bff;
+    background: #6317ff;
     color: white;
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    /* box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3); */
     transform: translateY(-2px);
 }
 

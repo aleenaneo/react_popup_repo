@@ -51,7 +51,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 28px;
+  padding: 9px 9px;
   border-bottom: 1px solid #e5e7eb;
 }
 
@@ -84,7 +84,7 @@
 }
 
 .modal-content {
-  padding: 28px;
+  padding: 15px 9px;
   overflow-y: auto;
   flex: 1;
 }
