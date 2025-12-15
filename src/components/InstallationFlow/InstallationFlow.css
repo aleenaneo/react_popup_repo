@@ -11,47 +11,41 @@
 
 .intro-header {
     text-align: center;
-    padding: 20px 0;
+    padding: 10px 0 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
 }
 
-.intro-icon {
-    font-size: 64px;
-    margin-bottom: 16px;
-    animation: bounce 2s ease-in-out infinite;
-}
-
-@keyframes bounce {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-10px);
-    }
-}
-
-.intro-header h2 {
-    margin: 0 0 12px 0;
-    font-size: 28px;
-    font-weight: 700;
-    color: #212529;
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+.intro-logo {
+    max-width: 240px;
+    height: auto;
+    margin-bottom: 8px;
 }
 
 .intro-header p {
     margin: 0;
     font-size: 16px;
-    color: #6c757d;
+    color: #495057;
     line-height: 1.6;
+    max-width: 600px;
+}
+
+.read-more-link {
+    color: #6610f2;
+    /* Purple link color from image */
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.read-more-link:hover {
+    text-decoration: underline;
 }
 
 .intro-actions {
     display: flex;
+    flex-direction: row-reverse;
     gap: 16px;
     justify-content: center;
     margin-top: 8px;

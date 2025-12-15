@@ -1,202 +1,139 @@
 .step-schedule {
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 24px;
 }
 
-.schedule-section {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.schedule-section h4 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: #212529;
-}
-
-.section-note {
-    margin: 0;
-    font-size: 13px;
-    color: #6c757d;
-    font-style: italic;
-}
-
-/* Date Grid */
-.date-grid {
+.schedule-layout {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 12px;
-    max-height: 300px;
-    overflow-y: auto;
-    padding: 4px;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
 }
 
-.date-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 12px 8px;
+/* Calendar Widget */
+.calendar-widget {
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    overflow: hidden;
     background: white;
-    border: 2px solid #dee2e6;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s;
+    width: 100%;
+    max-width: 350px;
 }
 
-.date-card:hover {
-    border-color: #007bff;
-    background: #f8f9ff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.15);
-}
-
-.date-card.selected {
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-    border-color: #0056b3;
+.calendar-header {
+    background: black;
     color: white;
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-}
-
-.date-day {
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    opacity: 0.8;
-}
-
-.date-number {
-    font-size: 24px;
-    font-weight: 700;
-    margin: 4px 0;
-}
-
-.date-month {
-    font-size: 12px;
-    font-weight: 500;
-    opacity: 0.8;
-}
-
-/* Time Slots */
-.time-slots {
+    padding: 12px;
     display: flex;
-    flex-direction: column;
-    gap: 12px;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
 }
 
-.time-slot {
+.calendar-header button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 8px;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: 600;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    background: white;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: white;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    border: none;
+    background: white;
+    font-size: 14px;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 16px 20px;
-    background: white;
-    border: 2px solid #dee2e6;
-    border-radius: 10px;
-    cursor: pointer;
+    justify-content: center;
     transition: all 0.2s;
-    text-align: left;
+    color: #000;
 }
 
-.time-slot:hover:not(:disabled) {
-    border-color: #007bff;
-    background: #f8f9ff;
-    transform: translateX(4px);
+.calendar-day:hover:not(:disabled) {
+    background: #f0f0f0;
 }
 
-.time-slot.selected {
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-    border-color: #0056b3;
-    color: white;
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+.calendar-day.selected {
+    background: white;
+    color: black;
+    border: 2px solid black;
+    font-weight: bold;
 }
 
-.time-slot:disabled {
-    opacity: 0.4;
+.calendar-day.disabled {
+    background: #808080;
+    color: #ccc;
     cursor: not-allowed;
 }
 
-.time-icon {
-    font-size: 24px;
+/* Right Side Options */
+.schedule-right {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-top: 10px;
 }
 
-.time-label {
+.option-group h4 {
+    margin: 0 0 12px 0;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
+    color: #333;
 }
 
-/* Radio Group */
-.radio-group {
+.radio-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
-.radio-option {
+.radio-label {
     display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 16px;
-    background: white;
-    border: 2px solid #dee2e6;
-    border-radius: 10px;
+    align-items: center;
+    gap: 10px;
     cursor: pointer;
-    transition: all 0.2s;
+    font-size: 15px;
+    color: #333;
 }
 
-.radio-option:hover {
-    border-color: #007bff;
-    background: #f8f9ff;
-}
-
-.radio-option.selected {
-    border-color: #007bff;
-    background: linear-gradient(135deg, #e7f3ff 0%, #d4e9ff 100%);
-    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
-}
-
-.radio-option input[type="radio"] {
-    margin-top: 4px;
+.radio-label input[type="radio"] {
     width: 18px;
     height: 18px;
-    cursor: pointer;
     accent-color: #007bff;
+    margin: 0;
+    cursor: pointer;
 }
 
-.radio-content {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    flex: 1;
+.radio-text {
+    line-height: 1.4;
 }
 
-.radio-icon {
-    font-size: 28px;
-}
-
-.radio-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: #212529;
-    margin-bottom: 4px;
-}
-
-.radio-description {
-    font-size: 14px;
-    color: #6c757d;
-}
-
-@media (max-width: 640px) {
-    .date-grid {
-        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+@media (max-width: 768px) {
+    .schedule-layout {
+        grid-template-columns: 1fr;
     }
 
-    .time-slot {
-        padding: 14px 16px;
-    }
-
-    .radio-option {
-        padding: 14px;
+    .calendar-widget {
+        max-width: 100%;
+        margin: 0 auto;
     }
 }

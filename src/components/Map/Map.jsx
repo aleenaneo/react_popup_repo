@@ -26,6 +26,26 @@ const FitBounds = ({ locations }) => {
   return null;
 };
 
+// Component to fly to selected location
+const MapController = ({ selectedMemberId, locations }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (selectedMemberId && locations) {
+      const selectedLoc = locations.find(loc => loc.member_id === selectedMemberId);
+      if (selectedLoc) {
+        map.flyTo(
+          [parseFloat(selectedLoc.lat), parseFloat(selectedLoc.lng)], 
+          15, 
+          { duration: 1.5 }
+        );
+      }
+    }
+  }, [selectedMemberId, locations, map]);
+
+  return null;
+};
+
 const Map = ({ locations, onLocationSelect, selectedMemberId }) => {
   const defaultCenter = locations && locations.length > 0
     ? [parseFloat(locations[0].lat), parseFloat(locations[0].lng)]
@@ -46,13 +66,14 @@ const Map = ({ locations, onLocationSelect, selectedMemberId }) => {
       <MapContainer
         center={defaultCenter}
         zoom={13}
-        style={{ height: '400px', width: '100%', borderRadius: '12px' }}
+        style={{ height: '100%', width: '100%', borderRadius: '12px' }}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <FitBounds locations={locations} />
+        <MapController selectedMemberId={selectedMemberId} locations={locations} />
         {locations.map((location, index) => (
           <Marker
             key={index}
@@ -60,20 +81,7 @@ const Map = ({ locations, onLocationSelect, selectedMemberId }) => {
             eventHandlers={{
               click: () => onLocationSelect(location.member_id)
             }}
-          >
-            <Popup>
-              <div className="map-popup">
-                <h4>Service Location {index + 1}</h4>
-                <p>Member ID: {location.member_id}</p>
-                <button
-                  className="select-location-btn"
-                  onClick={() => onLocationSelect(location.member_id)}
-                >
-                  {selectedMemberId === location.member_id ? 'Selected ✓' : 'Select Location'}
-                </button>
-              </div>
-            </Popup>
-          </Marker>
+          />
         ))}
       </MapContainer>
     </div>

@@ -11,10 +11,25 @@ const StepSchedule = ({ onNext, onBack, initialAppointment = {} }) => {
       : true
   });
 
-  const availableDates = getAvailableDates(14);
+  // Calendar State
+  const [currentDate, setCurrentDate] = useState(new Date());
+  
+  // Get offset date (start availability from 3 days from now)
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() + 3);
+  startDate.setHours(0, 0, 0, 0);
 
-  const handleDateSelect = (date) => {
-    setAppointment(prev => ({ ...prev, date }));
+  const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+  const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
+
+  const handleDateSelect = (day) => {
+    const selected = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    if (selected >= startDate) {
+      const year = selected.getFullYear();
+      const month = String(selected.getMonth() + 1).padStart(2, '0');
+      const dateStr = String(day).padStart(2, '0');
+      setAppointment(prev => ({ ...prev, date: `${year}-${month}-${dateStr}` }));
+    }
   };
 
   const handleTimeSelect = (time) => {
@@ -31,6 +46,66 @@ const StepSchedule = ({ onNext, onBack, initialAppointment = {} }) => {
     }
   };
 
+  const changeMonth = (offset) => {
+    const newDate = new Date(currentDate.setMonth(currentDate.getMonth() + offset));
+    setCurrentDate(new Date(newDate));
+  };
+
+  const renderCalendar = () => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const daysInMonth = getDaysInMonth(year, month);
+    const firstDay = getFirstDayOfMonth(year, month);
+    const monthName = currentDate.toLocaleString('default', { month: 'long' });
+    
+    // Day names
+    const days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+    
+    // Calendar grid generation
+    const grid = [];
+    
+    // Empty cells for days before the 1st
+    for (let i = 0; i < firstDay; i++) {
+      grid.push(<div key={`empty-${i}`} className="calendar-day empty"></div>);
+    }
+
+    // Days of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateToCheck = new Date(year, month, day);
+      dateToCheck.setHours(0, 0, 0, 0);
+      
+      const isAvailable = dateToCheck >= startDate;
+      const isSelected = appointment.date === `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      
+      grid.push(
+        <button
+          key={day}
+          className={`calendar-day ${!isAvailable ? 'disabled' : ''} ${isSelected ? 'selected' : ''}`}
+          onClick={() => isAvailable && handleDateSelect(day)}
+          disabled={!isAvailable}
+        >
+          {day}
+        </button>
+      );
+    }
+
+    return (
+      <div className="calendar-widget">
+        <div className="calendar-header">
+          <button onClick={() => changeMonth(-1)}>&lt;</button>
+          <span>{monthName} {year}</span>
+          <button onClick={() => changeMonth(1)}>&gt;</button>
+        </div>
+        <div className="calendar-weekdays">
+          {days.map(d => <div key={d}>{d}</div>)}
+        </div>
+        <div className="calendar-grid">
+          {grid}
+        </div>
+      </div>
+    );
+  };
+
   const isFormComplete = appointment.date && appointment.time;
 
   return (
@@ -41,85 +116,58 @@ const StepSchedule = ({ onNext, onBack, initialAppointment = {} }) => {
         <p>Choose your preferred date and time for installation</p>
       </div>
 
-      {/* Date Selection */}
-      <div className="schedule-section">
-        <h4>Select Date</h4>
-        <p className="section-note">Available dates start 3 days from today</p>
-        <div className="date-grid">
-          {availableDates.map((date) => {
-            const dateObj = new Date(date);
-            const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
-            const dayNum = dateObj.getDate();
-            const month = dateObj.toLocaleDateString('en-US', { month: 'short' });
-
-            return (
-              <button
-                key={date}
-                className={`date-card ${appointment.date === date ? 'selected' : ''}`}
-                onClick={() => handleDateSelect(date)}
-              >
-                <div className="date-day">{dayName}</div>
-                <div className="date-number">{dayNum}</div>
-                <div className="date-month">{month}</div>
-              </button>
-            );
-          })}
+      <div className="schedule-layout">
+        {/* Left Side: Calendar */}
+        <div className="schedule-left">
+          {renderCalendar()}
         </div>
-      </div>
 
-      {/* Time Slot Selection */}
-      <div className="schedule-section">
-        <h4>Select Time Slot</h4>
-        <div className="time-slots">
-          {TIME_SLOTS.map((slot) => (
-            <button
-              key={slot.id}
-              className={`time-slot ${appointment.time === slot.value ? 'selected' : ''}`}
-              onClick={() => handleTimeSelect(slot.value)}
-              disabled={!appointment.date}
-            >
-              <span className="time-icon">🕐</span>
-              <span className="time-label">{slot.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Vehicle Drop-off Option */}
-      <div className="schedule-section">
-        <h4>Service Preference</h4>
-        <div className="radio-group">
-          <label className={`radio-option ${appointment.stayWithVehicle ? 'selected' : ''}`}>
-            <input
-              type="radio"
-              name="vehicleOption"
-              checked={appointment.stayWithVehicle}
-              onChange={() => handleVehicleOptionChange(true)}
-            />
-            <div className="radio-content">
-              <span className="radio-icon">⏱️</span>
-              <div>
-                <div className="radio-title">Wait with the vehicle</div>
-                <div className="radio-description">Stay at the service center during installation</div>
-              </div>
+        {/* Right Side: Options */}
+        <div className="schedule-right">
+          {/* Time Slots */}
+          <div className="option-group">
+            <h4>Select Time</h4>
+            <div className="radio-list">
+              {TIME_SLOTS.map((slot) => (
+                <label key={slot.id} className="radio-label">
+                  <input
+                    type="radio"
+                    name="timeSlot"
+                    checked={appointment.time === slot.value}
+                    onChange={() => handleTimeSelect(slot.value)}
+                    disabled={!appointment.date}
+                  />
+                  <span className="radio-text">{slot.label}</span>
+                </label>
+              ))}
             </div>
-          </label>
+          </div>
 
-          <label className={`radio-option ${!appointment.stayWithVehicle ? 'selected' : ''}`}>
-            <input
-              type="radio"
-              name="vehicleOption"
-              checked={!appointment.stayWithVehicle}
-              onChange={() => handleVehicleOptionChange(false)}
-            />
-            <div className="radio-content">
-              <span className="radio-icon">🚶</span>
-              <div>
-                <div className="radio-title">Drop off vehicle</div>
-                <div className="radio-description">Leave your vehicle and pick it up later</div>
-              </div>
+          {/* Service Preference */}
+          <div className="option-group">
+            <h4>What Would you Like:</h4>
+            <div className="radio-list">
+              <label className="radio-label">
+                <input
+                  type="radio"
+                  name="vehicleOption"
+                  checked={!appointment.stayWithVehicle}
+                  onChange={() => handleVehicleOptionChange(false)}
+                />
+                <span className="radio-text">Drop off the vehicle</span>
+              </label>
+
+              <label className="radio-label">
+                <input
+                  type="radio"
+                  name="vehicleOption"
+                  checked={appointment.stayWithVehicle}
+                  onChange={() => handleVehicleOptionChange(true)}
+                />
+                <span className="radio-text">Wait with the vehicle</span>
+              </label>
             </div>
-          </label>
+          </div>
         </div>
       </div>
 

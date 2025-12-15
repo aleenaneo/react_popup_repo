@@ -6,9 +6,9 @@
 
 // Mock data
 const MOCK_LOCATIONS = [
-  { lat: "28.6139", lng: "77.2090", member_id: 1001 },
-  { lat: "28.7041", lng: "77.1025", member_id: 1002 },
-  { lat: "28.5355", lng: "77.3910", member_id: 1003 }
+  { lat: "28.6139", lng: "77.2090", member_id: 1001, name: "Downtown Auto Center", address: "123 Main St, New Delhi" },
+  { lat: "28.7041", lng: "77.1025", member_id: 1002, name: "North Side Garage", address: "456 North Ave, New Delhi" },
+  { lat: "28.5355", lng: "77.3910", member_id: 1003, name: "East End Customs", address: "789 East Rd, Noida" }
 ];
 
 const MOCK_YEARS = ["2020", "2021", "2022", "2023", "2024"];

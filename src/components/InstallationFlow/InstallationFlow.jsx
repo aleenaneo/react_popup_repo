@@ -28,7 +28,7 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
       stayWithVehicle: true
     }
   });
-  const [includeInstallation, setIncludeInstallation] = useState(true);
+  const [includeInstallation, setIncludeInstallation] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -141,7 +141,7 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
         stayWithVehicle: true
       }
     });
-    setIncludeInstallation(true);
+    setIncludeInstallation(false);
     setError('');
   };
 
@@ -156,9 +156,14 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
         return (
           <div className="intro-step">
             <div className="intro-header">
-              <div className="intro-icon">🔧</div>
-              <h2>Professional Installation Service</h2>
-              <p>Get your product professionally installed at your convenience</p>
+              <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Nextbase_logo.svg/2560px-Nextbase_logo.svg.png" 
+                alt="NEXTBASE" 
+                className="intro-logo" 
+              />
+              <p>
+                Take the hassle out of installation and have your new Nextbase Dash Cam installed by our partners and their trained engineers at a time and location of your choice (Hardwire Kit included). <a href="#" className="read-more-link">Read more</a>
+              </p>
             </div>
 
             <ProductBox

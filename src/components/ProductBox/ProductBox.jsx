@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './ProductBox.css';
 
 const ProductBox = ({ product, installationProduct, onToggleInstallation }) => {
-  const [isInstallationAdded, setIsInstallationAdded] = useState(true);
+  const [isInstallationAdded, setIsInstallationAdded] = useState(false);
 
   const handleToggle = () => {
     setIsInstallationAdded(!isInstallationAdded);

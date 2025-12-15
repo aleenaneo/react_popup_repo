@@ -9,7 +9,7 @@ const StepLocation = ({ locations, onNext, onBack }) => {
     setSelectedMemberId(memberId);
   };
 
-  const handleNext = () => {
+  const handleContinue = () => {
     if (selectedMemberId) {
       const selectedLocation = locations.find(loc => loc.member_id === selectedMemberId);
       onNext(selectedMemberId, selectedLocation);
@@ -21,21 +21,40 @@ const StepLocation = ({ locations, onNext, onBack }) => {
       <div className="step-header">
         <div className="step-icon">🗺️</div>
         <h3>Select Service Location</h3>
-        <p>Choose the nearest service center from the map below</p>
+        <p>Choose your preferred location from the list or map</p>
       </div>
 
-      <Map
-        locations={locations}
-        onLocationSelect={handleLocationSelect}
-        selectedMemberId={selectedMemberId}
-      />
-
-      {selectedMemberId && (
-        <div className="location-selected">
-          <span className="check-icon">✓</span>
-          Location selected (Member ID: {selectedMemberId})
+      <div className="location-layout">
+        {/* Left Side: Map */}
+        <div className="location-map-section">
+          <Map
+            locations={locations}
+            onLocationSelect={handleLocationSelect}
+            selectedMemberId={selectedMemberId}
+          />
         </div>
-      )}
+
+        {/* Right Side: Location List */}
+        <div className="location-list-section">
+          <div className="location-list">
+            {locations.map((location) => (
+              <div 
+                key={location.member_id}
+                className={`location-card ${selectedMemberId === location.member_id ? 'selected' : ''}`}
+                onClick={() => handleLocationSelect(location.member_id)}
+              >
+                <div className="location-info">
+                  <h4>{location.name || `Service Center ${location.member_id}`}</h4>
+                  <p>{location.address || `Member ID: ${location.member_id}`}</p>
+                </div>
+                {selectedMemberId === location.member_id && (
+                  <div className="selected-indicator">✓</div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       <div className="step-actions">
         <button className="btn btn-secondary" onClick={onBack}>
@@ -43,7 +62,7 @@ const StepLocation = ({ locations, onNext, onBack }) => {
         </button>
         <button
           className="btn btn-primary"
-          onClick={handleNext}
+          onClick={handleContinue}
           disabled={!selectedMemberId}
         >
           Continue

@@ -6,7 +6,7 @@
 
 .vehicle-form {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 20px;
 }
 
@@ -17,31 +17,47 @@
 }
 
 .form-group label {
-    font-size: 14px;
-    font-weight: 600;
-    color: #495057;
+    /* Visually hide label but keep accessible */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
 }
 
 .form-group select {
-    padding: 12px 16px;
+    width: 100%;
+    padding: 16px 20px;
     font-size: 16px;
-    border: 2px solid #dee2e6;
+    color: #495057;
+    border: 1px solid #dee2e6;
     border-radius: 8px;
-    background: white;
+    background: #f8f9fa;
     cursor: pointer;
     transition: all 0.2s;
+    appearance: none;
+    /* Remove default arrow */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    background-size: 12px;
 }
 
 .form-group select:focus {
     outline: none;
     border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1);
 }
 
 .form-group select:disabled {
-    background: #f8f9fa;
+    background-color: #f8f9fa;
+    color: #adb5bd;
     cursor: not-allowed;
-    opacity: 0.6;
+    opacity: 0.7;
 }
 
 .form-group select.error {
