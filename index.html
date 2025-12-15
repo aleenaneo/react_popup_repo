@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BigCommerce Installation Flow</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  </head>
+  <body>
+    <!-- Global mounting point for React app -->
+    <div id="react-installation-root"></div>
+    
+    <!-- Simulate BigCommerce theme data injection -->
+    <script>
+      window.initialData = {
+        token: 'demo-storefront-token',
+        endpoint: "/graphql",
+        product_id_th: '123',
+        currency_code: "USD",
+        mode: 'development' // production | test | development | local
+      };
+    </script>
+    
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
