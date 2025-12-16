@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Map from '../Map/Map';
 import './StepLocation.css';
 
-const StepLocation = ({ locations, onNext, onBack }) => {
+const StepLocation = ({ locations, onNext, onBack, onClose }) => {
   const [selectedMemberId, setSelectedMemberId] = useState(null);
 
   const handleLocationSelect = (memberId) => {
@@ -19,9 +19,7 @@ const StepLocation = ({ locations, onNext, onBack }) => {
   return (
     <div className="step-location">
       <div className="step-header">
-        <div className="step-icon">🗺️</div>
-        <h3>Select Service Location</h3>
-        <p>Choose your preferred location from the list or map</p>
+        <h3>Select installation location</h3>
       </div>
 
       <div className="location-layout">
@@ -57,15 +55,18 @@ const StepLocation = ({ locations, onNext, onBack }) => {
       </div>
 
       <div className="step-actions">
-        <button className="btn btn-secondary" onClick={onBack}>
-          Back
+        <button className="btn btn-secondary btn-back" onClick={onBack}>
+          Go Back
+        </button>
+        <button className="btn btn-secondary btn-cancel" onClick={onClose}>
+          Cancel
         </button>
         <button
-          className="btn btn-primary"
+          className="btn btn-primary btn-continue"
           onClick={handleContinue}
           disabled={!selectedMemberId}
         >
-          Continue
+          Proceed
         </button>
       </div>
     </div>

@@ -1,134 +1,117 @@
 .product-box {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: 12px;
-    margin-bottom: 24px;
-    border: 1px solid #dee2e6;
-}
-
-.product-image {
-    flex-shrink: 0;
-    width: 100px;
-    height: 100px;
-    border-radius: 8px;
-    overflow: hidden;
+    padding: 16px 24px;
     background: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    gap: 16px;
+    width: 100%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    transition: border-color 0.2s;
 }
 
-.product-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.product-box.selected {
+    border: 2px solid #0d6efd;
+    padding: 15px 23px;
+    /* Compensate for border width change to prevent layout shift */
+}
+
+.product-icon-wrapper {
+    flex-shrink: 0;
+}
+
+.product-icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
 }
 
 .product-details {
     flex: 1;
-    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-.product-name {
-    margin: 0 0 8px 0;
+.product-title {
+    margin: 0;
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 500;
+    /* Regular/Medium per image look */
     color: #212529;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    line-height: 1.2;
 }
 
-.installation-info {
-    margin: 0;
+.product-subtitle {
+    margin: 4px 0 0 0;
     font-size: 14px;
-    color: #6c757d;
-    font-style: italic;
-}
-
-.product-loading {
-    margin: 0;
-    color: #6c757d;
-    text-align: center;
+    color: #495057;
+    font-weight: 400;
 }
 
 .product-actions {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    gap: 12px;
+    align-items: center;
+    gap: 8px;
+    min-width: 80px;
 }
 
 .product-price {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
     color: #212529;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
 }
 
-.installation-price {
-    font-size: 14px;
-    color: #28a745;
-    font-weight: 500;
-    margin-top: 4px;
-}
-
-.toggle-button {
-    padding: 8px 16px;
-    border: none;
+.action-button {
+    padding: 6px 24px;
     border-radius: 6px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
+    border: none;
     transition: all 0.2s;
-    white-space: nowrap;
+    width: 100%;
 }
 
-.toggle-button.added {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+.action-button.add {
+    background-color: #0d6efd;
     color: white;
-    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
 }
 
-.toggle-button.added:hover {
-    background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
-    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
-    transform: translateY(-1px);
+.action-button.add:hover {
+    background-color: #0b5ed7;
 }
 
-.toggle-button.removed {
-    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+.action-button.added {
+    background-color: white;
+    color: #212529;
+    border: 1px solid #6c757d;
+    border-radius: 20px;
+    padding: 4px 16px;
+    font-size: 12px;
+    font-weight: 500;
 }
 
-.toggle-button.removed:hover {
-    background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
-    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
-    transform: translateY(-1px);
+.action-button.added:hover {
+    background-color: #f8f9fa;
+    border-color: #495057;
 }
 
 @media (max-width: 640px) {
     .product-box {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .product-image {
-        width: 100%;
-        height: 200px;
-    }
-
-    .product-actions {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .product-price {
-        align-items: flex-start;
+        padding: 16px;
+        flex-wrap: wrap;
+        /* Allow wrapping if very narrow, though row is preferred */
     }
 }

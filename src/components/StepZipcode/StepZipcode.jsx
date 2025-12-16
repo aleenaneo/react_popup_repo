@@ -3,7 +3,7 @@ import { checkZipcode } from '../../api/installationService';
 import { isValidZipcode } from '../../utils/helpers';
 import './StepZipcode.css';
 
-const StepZipcode = ({ onSuccess, onCancel }) => {
+const StepZipcode = ({ onSuccess, onBack, onClose }) => {
   const [zipcode, setZipcode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -42,16 +42,14 @@ const StepZipcode = ({ onSuccess, onCancel }) => {
   return (
     <div className="step-zipcode">
       <div className="step-header">
-        <div className="step-icon">📍</div>
-        <h3>Check Service Availability</h3>
-        <p>Enter your zipcode to check if installation service is available in your area</p>
+        <h3>Installation Zip Code <span className="header-subtitle">(Fill in to see available installation locations)</span></h3>
       </div>
 
       <div className="zipcode-input-group">
         <input
           type="text"
           className={`zipcode-input ${error ? 'error' : ''}`}
-          placeholder="Enter 6-digit zipcode"
+          placeholder="Start with your Zip Code"
           value={zipcode}
           onChange={(e) => {
             setZipcode(e.target.value.replace(/\D/g, '').slice(0, 6));
@@ -66,14 +64,21 @@ const StepZipcode = ({ onSuccess, onCancel }) => {
 
       <div className="step-actions">
         <button 
-          className="btn btn-secondary" 
-          onClick={onCancel}
+          className="btn btn-secondary btn-back" 
+          onClick={onBack}
+          disabled={loading}
+        >
+          Go Back
+        </button>
+        <button 
+          className="btn btn-secondary btn-cancel" 
+          onClick={onClose}
           disabled={loading}
         >
           Cancel
         </button>
         <button 
-          className="btn btn-primary" 
+          className="btn btn-primary btn-proceed" 
           onClick={handleCheck}
           disabled={loading || zipcode.length !== 6}
         >
@@ -83,7 +88,7 @@ const StepZipcode = ({ onSuccess, onCancel }) => {
               Checking...
             </>
           ) : (
-            'Check Availability'
+            'Proceed'
           )}
         </button>
       </div>

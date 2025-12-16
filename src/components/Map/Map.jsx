@@ -34,10 +34,9 @@ const MapController = ({ selectedMemberId, locations }) => {
     if (selectedMemberId && locations) {
       const selectedLoc = locations.find(loc => loc.member_id === selectedMemberId);
       if (selectedLoc) {
-        map.flyTo(
+        map.panTo(
           [parseFloat(selectedLoc.lat), parseFloat(selectedLoc.lng)], 
-          15, 
-          { duration: 1.5 }
+          { animate: true, duration: 1.5 }
         );
       }
     }
@@ -67,6 +66,11 @@ const Map = ({ locations, onLocationSelect, selectedMemberId }) => {
         center={defaultCenter}
         zoom={13}
         style={{ height: '100%', width: '100%', borderRadius: '12px' }}
+        zoomControl={false}
+        scrollWheelZoom={false}
+        doubleClickZoom={false}
+        touchZoom={false}
+        dragging={false} 
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

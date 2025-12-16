@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { getAvailableDates, TIME_SLOTS } from '../../utils/helpers';
 import './StepSchedule.css';
 
-const StepSchedule = ({ onNext, onBack, initialAppointment = {} }) => {
+const StepSchedule = ({ onNext, onBack, onClose, initialAppointment = {} }) => {
   const [appointment, setAppointment] = useState({
     date: initialAppointment.date || '',
     time: initialAppointment.time || '',
@@ -14,9 +14,9 @@ const StepSchedule = ({ onNext, onBack, initialAppointment = {} }) => {
   // Calendar State
   const [currentDate, setCurrentDate] = useState(new Date());
   
-  // Get offset date (start availability from 3 days from now)
+  // Get offset date (start availability from 4 days from now)
   const startDate = new Date();
-  startDate.setDate(startDate.getDate() + 3);
+  startDate.setDate(startDate.getDate() + 4);
   startDate.setHours(0, 0, 0, 0);
 
   const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
@@ -111,9 +111,12 @@ const StepSchedule = ({ onNext, onBack, initialAppointment = {} }) => {
   return (
     <div className="step-schedule">
       <div className="step-header">
-        <div className="step-icon">📅</div>
-        <h3>Schedule Installation</h3>
-        <p>Choose your preferred date and time for installation</p>
+        <h3>Select your desired appointment date</h3>
+        <p className="schedule-note">
+          Note: You must allow at least 4 business days when requesting an appointment to ensure you have
+          received your product (Saturday Appointments may be longer).
+          This is only a request; appointment confirmation is required.
+        </p>
       </div>
 
       <div className="schedule-layout">
@@ -172,15 +175,18 @@ const StepSchedule = ({ onNext, onBack, initialAppointment = {} }) => {
       </div>
 
       <div className="step-actions">
-        <button className="btn btn-secondary" onClick={onBack}>
-          Back
+        <button className="btn btn-secondary btn-back" onClick={onBack}>
+          Go Back
+        </button>
+        <button className="btn btn-secondary btn-cancel" onClick={onClose}>
+          Cancel
         </button>
         <button
-          className="btn btn-primary"
+          className="btn btn-primary btn-continue"
           onClick={handleNext}
           disabled={!isFormComplete}
         >
-          Continue to Checkout
+          Proceed
         </button>
       </div>
     </div>

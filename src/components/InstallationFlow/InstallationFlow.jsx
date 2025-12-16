@@ -52,8 +52,13 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
     }
   };
 
-  const handleProceedWithInstallation = () => {
-    setCurrentStep('zipcode');
+  const handleToggleInstallation = (added) => {
+    setIncludeInstallation(added);
+    if (added) {
+      setCurrentStep('zipcode');
+    } else {
+      setCurrentStep('intro');
+    }
   };
 
   const handleZipcodeSuccess = (zipcode, locations) => {
@@ -159,18 +164,17 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
 
             <div className="intro-actions">
               <button
+                className="btn btn-secondary"
+                onClick={handleClose}
+              >
+                Cancel
+              </button>
+              <button
                 className="btn btn-outline"
                 onClick={handleContinueWithoutInstallation}
                 disabled={loading}
               >
                 Continue Without Installation
-              </button>
-              <button
-                className="btn btn-primary btn-large"
-                onClick={handleProceedWithInstallation}
-                disabled={loading || !includeInstallation}
-              >
-                {loading ? 'Processing...' : 'Proceed with Installation'}
               </button>
             </div>
           </div>
@@ -180,7 +184,8 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
         return (
           <StepZipcode
             onSuccess={handleZipcodeSuccess}
-            onCancel={handleBack}
+            onBack={handleBack}
+            onClose={handleClose}
           />
         );
 
@@ -190,6 +195,7 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
             locations={flowData.locations}
             onNext={handleLocationNext}
             onBack={handleBack}
+            onClose={handleClose}
           />
         );
 
@@ -198,6 +204,7 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
           <StepVehicle
             onNext={handleVehicleNext}
             onBack={handleBack}
+            onClose={handleClose}
             initialVehicle={flowData.vehicle}
           />
         );
@@ -207,6 +214,7 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
           <StepSchedule
             onNext={handleScheduleNext}
             onBack={handleBack}
+            onClose={handleClose}
             initialAppointment={flowData.appointment}
           />
         );
@@ -235,7 +243,7 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
           <ProductBox
             product={product}
             installationProduct={installationProduct}
-            onToggleInstallation={setIncludeInstallation}
+            onToggleInstallation={handleToggleInstallation}
           />
         </div>
 
