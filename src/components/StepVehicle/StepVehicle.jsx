@@ -6,22 +6,19 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {} }) => {
   const [vehicle, setVehicle] = useState({
     year: initialVehicle.year || '',
     make: initialVehicle.make || '',
-    model: initialVehicle.model || '',
-    type: initialVehicle.type || ''
+    model: initialVehicle.model || ''
   });
 
   const [options, setOptions] = useState({
     years: [],
     makes: [],
-    models: [],
-    types: []
+    models: []
   });
 
   const [loading, setLoading] = useState({
     years: false,
     makes: false,
-    models: false,
-    types: false
+    models: false
   });
 
   const [errors, setErrors] = useState({});
@@ -42,14 +39,7 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {} }) => {
     }
   }, [vehicle.make]);
 
-  // When Model changes, load Types
-  useEffect(() => {
-    if (vehicle.model) {
-      loadTypes(vehicle.model);
-    } else {
-      setOptions(prev => ({ ...prev, types: [] }));
-    }
-  }, [vehicle.model]);
+
 
   const loadYears = async () => {
     setLoading(prev => ({ ...prev, years: true }));
@@ -88,17 +78,7 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {} }) => {
     }
   };
 
-  const loadTypes = async (model) => {
-    setLoading(prev => ({ ...prev, types: true }));
-    try {
-      const data = await getTypes(model);
-      setOptions(prev => ({ ...prev, types: data }));
-    } catch (error) {
-      console.error("Failed to load types", error);
-    } finally {
-      setLoading(prev => ({ ...prev, types: false }));
-    }
-  };
+
 
   const handleChange = (field, value) => {
     setVehicle(prev => {
@@ -107,22 +87,19 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {} }) => {
       // Reset dependent fields
       if (field === 'make') {
         newState.model = '';
-        newState.type = '';
         // Years remain
-      } else if (field === 'model') {
-        newState.type = '';
       }
       return newState;
     });
   };
 
   const handleNext = () => {
-    if (vehicle.year && vehicle.make && vehicle.model && vehicle.type) {
+    if (vehicle.year && vehicle.make && vehicle.model) {
       onNext(vehicle);
     }
   };
 
-  const isFormComplete = vehicle.year && vehicle.make && vehicle.model && vehicle.type;
+  const isFormComplete = vehicle.year && vehicle.make && vehicle.model;
 
   return (
     <div className="step-vehicle">
@@ -176,20 +153,7 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {} }) => {
           </select>
         </div>
 
-        {/* Type Dropdown */}
-        <div className="form-group">
-          <select
-            id="type"
-            value={vehicle.type}
-            onChange={(e) => handleChange('type', e.target.value)}
-            disabled={!vehicle.year || loading.types}
-          >
-            <option value="">Select Type</option>
-            {options.types.map((type) => (
-              <option key={type} value={type}>{type}</option>
-            ))}
-          </select>
-        </div>
+
       </div>
 
       <div className="step-actions">

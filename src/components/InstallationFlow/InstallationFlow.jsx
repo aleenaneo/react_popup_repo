@@ -76,21 +76,21 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
       memberId,
       selectedLocation: location
     }));
-    setCurrentStep('vehicle');
-  };
-
-  const handleVehicleNext = (vehicle) => {
-    setFlowData(prev => ({
-      ...prev,
-      vehicle
-    }));
     setCurrentStep('schedule');
   };
 
-  const handleScheduleNext = async (appointment) => {
+  const handleScheduleNext = (appointment) => {
     setFlowData(prev => ({
       ...prev,
       appointment
+    }));
+    setCurrentStep('vehicle');
+  };
+
+  const handleVehicleNext = async (vehicle) => {
+    setFlowData(prev => ({
+      ...prev,
+      vehicle
     }));
 
     // Final step: Add to cart with all metadata
@@ -104,8 +104,8 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
         metadata: {
           zipcode: flowData.zipcode,
           member_id: flowData.memberId,
-          vehicle: flowData.vehicle,
-          appointment: appointment
+          vehicle: vehicle,
+          appointment: flowData.appointment
         }
       };
 
@@ -120,7 +120,7 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
   };
 
   const handleBack = () => {
-    const stepOrder = ['intro', 'zipcode', 'location', 'vehicle', 'schedule'];
+    const stepOrder = ['intro', 'zipcode', 'location', 'schedule', 'vehicle'];
     const currentIndex = stepOrder.indexOf(currentStep);
     if (currentIndex > 0) {
       setCurrentStep(stepOrder[currentIndex - 1]);
@@ -199,16 +199,6 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
           />
         );
 
-      case 'vehicle':
-        return (
-          <StepVehicle
-            onNext={handleVehicleNext}
-            onBack={handleBack}
-            onClose={handleClose}
-            initialVehicle={flowData.vehicle}
-          />
-        );
-
       case 'schedule':
         return (
           <StepSchedule
@@ -216,6 +206,16 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
             onBack={handleBack}
             onClose={handleClose}
             initialAppointment={flowData.appointment}
+          />
+        );
+
+      case 'vehicle':
+        return (
+          <StepVehicle
+            onNext={handleVehicleNext}
+            onBack={handleBack}
+            onClose={handleClose}
+            initialVehicle={flowData.vehicle}
           />
         );
 

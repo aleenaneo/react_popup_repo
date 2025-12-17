@@ -4,10 +4,10 @@
  */
 
 const API_BASE_URLS = {
-  production: 'https://api.production.example.com',
-  test: 'https://api.test.example.com',
-  development: 'https://api.dev.example.com',
-  local: 'http://localhost:3000'
+  production: 'http://127.0.0.1:8',
+  test: 'http://127.0.0.1:8',
+  development: 'http://127.0.0.1:8',
+  local: 'http://127.0.0.1:8'
 };
 
 /**
@@ -49,7 +49,8 @@ export const getApiBaseUrl = () => {
  * @returns {string} Full URL
  */
 export const getApiUrl = (path) => {
-  const baseUrl = getApiBaseUrl();
+  // Use the global API_BASE_URL if available, otherwise use the configured base URL
+  const baseUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : getApiBaseUrl();
   return `${baseUrl}${path}`;
 };
 

@@ -35,13 +35,13 @@ export const formatDate = (date) => {
 };
 
 /**
- * Gets available dates starting 3 days from today
+ * Gets available dates starting 8 days from today
  * @param {number} count - Number of dates to generate
  * @returns {Array<string>} Array of formatted dates
  */
 export const getAvailableDates = (count = 14) => {
   const dates = [];
-  for (let i = 3; i < count + 3; i++) {
+  for (let i = 8; i < count + 8; i++) {
     dates.push(formatDate(getDateOffset(i)));
   }
   return dates;

@@ -14,9 +14,9 @@ const StepSchedule = ({ onNext, onBack, onClose, initialAppointment = {} }) => {
   // Calendar State
   const [currentDate, setCurrentDate] = useState(new Date());
   
-  // Get offset date (start availability from 4 days from now)
+  // Get offset date (start availability from 8 days from now)
   const startDate = new Date();
-  startDate.setDate(startDate.getDate() + 4);
+  startDate.setDate(startDate.getDate() + 8);
   startDate.setHours(0, 0, 0, 0);
 
   const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
@@ -113,7 +113,7 @@ const StepSchedule = ({ onNext, onBack, onClose, initialAppointment = {} }) => {
       <div className="step-header">
         <h3>Select your desired appointment date</h3>
         <p className="schedule-note">
-          Note: You must allow at least 4 business days when requesting an appointment to ensure you have
+          Note: You must allow at least 8 business days when requesting an appointment to ensure you have
           received your product (Saturday Appointments may be longer).
           This is only a request; appointment confirmation is required.
         </p>
