@@ -44,7 +44,7 @@ export const MockAPIService = {
     await delay(1000);
     
     // Simulate invalid zipcode
-    if (zipcode === "000000") {
+    if (zipcode === "00000") {
       return { locations: [] };
     }
     

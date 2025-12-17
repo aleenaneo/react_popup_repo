@@ -11,7 +11,7 @@ const StepZipcode = ({ onSuccess, onBack, onClose }) => {
   const handleCheck = async () => {
     // Validate zipcode
     if (!isValidZipcode(zipcode)) {
-      setError('Please enter a valid 6-digit zipcode');
+      setError('Please enter a valid 5-digit zipcode');
       return;
     }
 
@@ -52,11 +52,11 @@ const StepZipcode = ({ onSuccess, onBack, onClose }) => {
           placeholder="Start with your Zip Code"
           value={zipcode}
           onChange={(e) => {
-            setZipcode(e.target.value.replace(/\D/g, '').slice(0, 6));
+            setZipcode(e.target.value.replace(/\D/g, '').slice(0, 5));
             setError('');
           }}
           onKeyPress={handleKeyPress}
-          maxLength={6}
+          maxLength={5}
           disabled={loading}
         />
         {error && <p className="error-message">{error}</p>}
@@ -80,7 +80,7 @@ const StepZipcode = ({ onSuccess, onBack, onClose }) => {
         <button 
           className="btn btn-primary btn-proceed" 
           onClick={handleCheck}
-          disabled={loading || zipcode.length !== 6}
+          disabled={loading || zipcode.length !== 5}
         >
           {loading ? (
             <>

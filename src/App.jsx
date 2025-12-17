@@ -45,7 +45,16 @@ function App() {
 
     switch (type) {
       case 'pdp':
-        selectors = ['.add-to-cart-button', '#add-to-cart', '[data-add-to-cart]'];
+        selectors = [
+          '.add-to-cart-button', 
+          '#add-to-cart', 
+          '[data-add-to-cart]',
+          '#form-action-addToCart',
+          '.cm_variant_main_add_to_cart_button',
+          '.iq_buy_button',
+          '.cm-iq-buy-button',
+          '.cm_variant_button_add_to_cart'
+        ];
         break;
       case 'plp':
         selectors = ['.product-card-button', '.quick-add-button'];
@@ -54,7 +63,11 @@ function App() {
         selectors = ['.checkout-button', '#checkout'];
         break;
       default:
-        selectors = ['.add-to-cart-button'];
+        selectors = [
+          '.add-to-cart-button',
+          '#form-action-addToCart',
+          '.cm_variant_main_add_to_cart_button'
+        ];
     }
 
     selectors.forEach(selector => {
@@ -70,7 +83,16 @@ function App() {
 
     switch (type) {
       case 'pdp':
-        selectors = ['.add-to-cart-button', '#add-to-cart', '[data-add-to-cart]'];
+        selectors = [
+          '.add-to-cart-button', 
+          '#add-to-cart', 
+          '[data-add-to-cart]',
+          '#form-action-addToCart',
+          '.cm_variant_main_add_to_cart_button',
+          '.iq_buy_button',
+          '.cm-iq-buy-button',
+          '.cm_variant_button_add_to_cart'
+        ];
         break;
       case 'plp':
         selectors = ['.product-card-button', '.quick-add-button'];
@@ -79,7 +101,11 @@ function App() {
         selectors = ['.checkout-button', '#checkout'];
         break;
       default:
-        selectors = ['.add-to-cart-button'];
+        selectors = [
+          '.add-to-cart-button',
+          '#form-action-addToCart',
+          '.cm_variant_main_add_to_cart_button'
+        ];
     }
 
     selectors.forEach(selector => {
@@ -110,22 +136,24 @@ function App() {
   return (
     <div className="app">
       {/* Demo trigger button for testing */}
-      <div className="demo-section">
-        <h1>BigCommerce Installation Flow Demo</h1>
-        <p className="demo-description">
-          Click the button below to simulate the installation flow popup
-        </p>
-        <button
-          className="demo-trigger-button"
-          onClick={() => setIsModalOpen(true)}
-        >
-          🛒 Add to Cart (Demo)
-        </button>
-        <div className="demo-info">
-          <p><strong>Page Type:</strong> {pageType.toUpperCase()}</p>
-          <p><strong>Mode:</strong> {getInitialData().mode}</p>
+      {import.meta.env.DEV && (
+        <div className="demo-section">
+          <h1>BigCommerce Installation Flow Demo</h1>
+          <p className="demo-description">
+            Click the button below to simulate the installation flow popup
+          </p>
+          <button
+            className="demo-trigger-button"
+            onClick={() => setIsModalOpen(true)}
+          >
+            🛒 Add to Cart (Demo)
+          </button>
+          <div className="demo-info">
+            <p><strong>Page Type:</strong> {pageType.toUpperCase()}</p>
+            <p><strong>Mode:</strong> {getInitialData().mode}</p>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Installation Flow Modal */}
       <InstallationFlow

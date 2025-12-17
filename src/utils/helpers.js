@@ -8,7 +8,7 @@
  * @returns {boolean} True if valid
  */
 export const isValidZipcode = (zipcode) => {
-  return /^\d{6}$/.test(zipcode);
+  return /^\d{5}$/.test(zipcode);
 };
 
 /**

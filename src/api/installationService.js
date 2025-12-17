@@ -15,7 +15,7 @@ const useMockAPI = () => {
 
 /**
  * Check if zipcode is serviceable
- * @param {string} zipcode - 6 digit zipcode
+ * @param {string} zipcode - 5 digit zipcode
  * @returns {Promise<Object>} Response with locations array
  */
 export const checkZipcode = async (zipcode) => {
