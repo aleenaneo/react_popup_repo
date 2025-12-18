@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import InstallationFlow from './components/InstallationFlow/InstallationFlow';
 import { getInitialData } from './api/apiConfig';
 import { detectPageType } from './utils/helpers';
-import { enableMockMode } from './api/mockApiService';
+import { enableMockMode, disableMockMode } from './api/mockApiService';
 import './App.css';
 
 function App() {
@@ -11,11 +11,11 @@ function App() {
   const [productData, setProductData] = useState(null);
 
   useEffect(() => {
-    // Enable mock API mode for development
+    // For testing with real API, disable mock mode
     const initialData = getInitialData();
     if (initialData.mode === 'development' || initialData.mode === 'local') {
-      enableMockMode();
-      console.log('🧪 Mock API enabled for development');
+      // Disable mock mode to use real API
+      console.log('🔌 Real API mode enabled');
     }
 
     // Detect page type

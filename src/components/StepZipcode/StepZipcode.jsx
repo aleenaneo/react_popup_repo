@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { checkZipcode } from '../../api/installationService';
+import { checkZipcodeByAPI } from '../../api/installationService';
 import { isValidZipcode } from '../../utils/helpers';
 import './StepZipcode.css';
 
@@ -19,7 +19,7 @@ const StepZipcode = ({ onSuccess, onBack, onClose }) => {
     setError('');
 
     try {
-      const response = await checkZipcode(zipcode);
+      const response = await checkZipcodeByAPI(zipcode);
       
       if (response.locations && response.locations.length > 0) {
         onSuccess(zipcode, response.locations);

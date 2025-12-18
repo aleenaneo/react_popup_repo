@@ -86,6 +86,13 @@
     color: #6c757d;
 }
 
+.distance-info {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    color: #007bff;
+    font-weight: 500;
+}
+
 .selected-indicator {
     width: 24px;
     height: 24px;

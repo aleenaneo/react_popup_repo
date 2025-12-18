@@ -44,6 +44,7 @@ const StepLocation = ({ locations, onNext, onBack, onClose }) => {
                 <div className="location-info">
                   <h4>{location.name || `Service Center ${location.member_id}`}</h4>
                   <p>{location.address || `Member ID: ${location.member_id}`}</p>
+                  {location.distance && <p className="distance-info">Distance: {location.distance}</p>}
                 </div>
                 {selectedMemberId === location.member_id && (
                   <div className="selected-indicator">✓</div>

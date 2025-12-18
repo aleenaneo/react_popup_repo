@@ -13,13 +13,28 @@
     
     <!-- Simulate BigCommerce theme data injection -->
     <script>
+      // Environment configuration examples:
+      // For development/local testing:
       window.initialData = {
         token: 'demo-storefront-token',
         endpoint: "/graphql",
         product_id_th: '123',
         currency_code: "USD",
-        mode: 'development' // production | test | development | local
+        mode: 'development', // production | test | development | local
+        programId: 1552
       };
+      
+      // For production, uncomment and modify the following:
+      /*
+      window.initialData = {
+        token: 'your-production-token',
+        endpoint: "/graphql",
+        product_id_th: 'your-product-id',
+        currency_code: "USD",
+        mode: 'production',
+        programId: 1552
+      };
+      */
     </script>
     
     <script type="module" src="/src/main.jsx"></script>

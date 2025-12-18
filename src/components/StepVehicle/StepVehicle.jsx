@@ -23,21 +23,28 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {} }) => {
 
   const [errors, setErrors] = useState({});
 
-  // Load initial data (Years and Makes)
+  // Load initial data (Years)
   useEffect(() => {
     loadYears();
-    loadMakes(); // Load default or all makes
   }, []);
+
+  // When Year changes, load Makes
+  useEffect(() => {
+    if (vehicle.year) {
+      loadMakes(vehicle.year);
+    } else {
+      setOptions(prev => ({ ...prev, makes: [], models: [] }));
+    }
+  }, [vehicle.year]);
 
   // When Make changes, load Models
   useEffect(() => {
-    if (vehicle.make) {
-      // Pass null for year if we changed the order to Make first
-      loadModels(null, vehicle.make);
+    if (vehicle.year && vehicle.make) {
+      loadModels(vehicle.year, vehicle.make);
     } else {
-      setOptions(prev => ({ ...prev, models: [], types: [] }));
+      setOptions(prev => ({ ...prev, models: [] }));
     }
-  }, [vehicle.make]);
+  }, [vehicle.make, vehicle.year]);
 
 
 
@@ -45,7 +52,9 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {} }) => {
     setLoading(prev => ({ ...prev, years: true }));
     try {
       const data = await getYears();
-      setOptions(prev => ({ ...prev, years: data }));
+      // Ensure data is an array
+      const yearsArray = Array.isArray(data) ? data : [];
+      setOptions(prev => ({ ...prev, years: yearsArray }));
     } catch (error) {
       console.error("Failed to load years", error);
     } finally {
@@ -56,9 +65,10 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {} }) => {
   const loadMakes = async () => {
     setLoading(prev => ({ ...prev, makes: true }));
     try {
-      // Call with no arguments to get default/all makes in mock
-      const data = await getMakes(); 
-      setOptions(prev => ({ ...prev, makes: data }));
+      const data = await getMakes(vehicle.year); 
+      // Ensure data is an array
+      const makesArray = Array.isArray(data) ? data : [];
+      setOptions(prev => ({ ...prev, makes: makesArray }));
     } catch (error) {
       console.error("Failed to load makes", error);
     } finally {
@@ -70,7 +80,9 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {} }) => {
     setLoading(prev => ({ ...prev, models: true }));
     try {
       const data = await getModels(year, make);
-      setOptions(prev => ({ ...prev, models: data }));
+      // Ensure data is an array
+      const modelsArray = Array.isArray(data) ? data : [];
+      setOptions(prev => ({ ...prev, models: modelsArray }));
     } catch (error) {
       console.error("Failed to load models", error);
     } finally {
@@ -108,13 +120,28 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {} }) => {
       </div>
 
       <div className="vehicle-form">
+        {/* Year Dropdown */}
+        <div className="form-group">
+          <select
+            id="year"
+            value={vehicle.year}
+            onChange={(e) => handleChange('year', e.target.value)}
+            disabled={loading.years}
+          >
+            <option value="">Select Year</option>
+            {options.years.map((year) => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+        </div>
+
         {/* Make Dropdown */}
         <div className="form-group">
           <select
             id="make"
             value={vehicle.make}
             onChange={(e) => handleChange('make', e.target.value)}
-            disabled={loading.makes}
+            disabled={!vehicle.year || loading.makes}
           >
             <option value="">Select Make</option>
             {options.makes.map((make) => (
@@ -129,26 +156,11 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {} }) => {
             id="model"
             value={vehicle.model}
             onChange={(e) => handleChange('model', e.target.value)}
-            disabled={!vehicle.make || loading.models}
+            disabled={!vehicle.year || !vehicle.make || loading.models}
           >
             <option value="">Select Model</option>
             {options.models.map((model) => (
               <option key={model} value={model}>{model}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Year Dropdown */}
-        <div className="form-group">
-          <select
-            id="year"
-            value={vehicle.year}
-            onChange={(e) => handleChange('year', e.target.value)}
-            disabled={!vehicle.model || loading.years}
-          >
-            <option value="">Select Year</option>
-            {options.years.map((year) => (
-              <option key={year} value={year}>{year}</option>
             ))}
           </select>
         </div>

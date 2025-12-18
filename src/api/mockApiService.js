@@ -11,6 +11,13 @@ const MOCK_LOCATIONS = [
   { lat: "28.5355", lng: "77.3910", member_id: 1003, name: "East End Customs", address: "789 East Rd, Noida" }
 ];
 
+// Mock data for new API format
+const MOCK_INSTALLERS = [
+  { latitude: "28.6139", longitude: "77.2090", memberId: 1001, companyName: "Downtown Auto Center", distance: "2.5 miles" },
+  { latitude: "28.7041", longitude: "77.1025", memberId: 1002, companyName: "North Side Garage", distance: "5.2 miles" },
+  { latitude: "28.5355", longitude: "77.3910", memberId: 1003, companyName: "East End Customs", distance: "3.8 miles" }
+];
+
 const MOCK_YEARS = ["2020", "2021", "2022", "2023", "2024"];
 
 const MOCK_MAKES = {
@@ -49,6 +56,29 @@ export const MockAPIService = {
     }
     
     return { locations: MOCK_LOCATIONS };
+  },
+
+  /**
+   * Check zipcode with new API format - simulates API delay
+   */
+  checkZipcodeByAPI: async (zipcode) => {
+    await delay(1000);
+    
+    // Simulate invalid zipcode
+    if (zipcode === "00000") {
+      return [];
+    }
+    
+    // Transform to match expected format
+    return {
+      locations: MOCK_INSTALLERS.map(installer => ({
+        lat: installer.latitude,
+        lng: installer.longitude,
+        member_id: installer.memberId,
+        name: installer.companyName,
+        distance: installer.distance
+      }))
+    };
   },
 
   /**

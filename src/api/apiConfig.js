@@ -4,10 +4,10 @@
  */
 
 const API_BASE_URLS = {
-  production: 'http://127.0.0.1:8',
-  test: 'http://127.0.0.1:8',
-  development: 'http://127.0.0.1:8',
-  local: 'http://127.0.0.1:8'
+  production: 'https://your-production-api.com',
+  test: 'https://your-test-api.com',
+  development: 'http://127.0.0.1:8000',
+  local: 'http://127.0.0.1:8000'
 };
 
 /**
@@ -22,7 +22,8 @@ export const getInitialData = () => {
       endpoint: '/graphql',
       product_id_th: '',
       currency_code: 'USD',
-      mode: 'development'
+      mode: 'development',
+      programId: 1552
     };
   }
   return window.initialData;
@@ -44,6 +45,15 @@ export const getApiBaseUrl = () => {
 };
 
 /**
+ * Gets the program ID from initial data
+ * @returns {number} Program ID
+ */
+export const getProgramId = () => {
+  const { programId } = getInitialData();
+  return programId || 1552;
+};
+
+/**
  * Gets the full API endpoint URL
  * @param {string} path - API path (e.g., '/check_zipcode')
  * @returns {string} Full URL
@@ -51,7 +61,14 @@ export const getApiBaseUrl = () => {
 export const getApiUrl = (path) => {
   // Use the global API_BASE_URL if available, otherwise use the configured base URL
   const baseUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : getApiBaseUrl();
-  return `${baseUrl}${path}`;
+  // Ensure path starts with a slash
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  const fullUrl = `${baseUrl}${normalizedPath}`;
+  
+  // Log the API URL being used for debugging
+  console.log(`API Request: ${fullUrl}`);
+  
+  return fullUrl;
 };
 
 /**
@@ -66,9 +83,40 @@ export const getAuthHeaders = () => {
   };
 };
 
+/**
+ * Gets environment-specific API configuration
+ * @returns {Object} API configuration
+ */
+export const getApiConfig = () => {
+  const { mode } = getInitialData();
+  
+  const config = {
+    production: {
+      baseUrl: 'https://your-production-api.com',
+      timeout: 10000
+    },
+    test: {
+      baseUrl: 'https://your-test-api.com',
+      timeout: 10000
+    },
+    development: {
+      baseUrl: 'http://127.0.0.1:8000',
+      timeout: 5000
+    },
+    local: {
+      baseUrl: 'http://127.0.0.1:8000',
+      timeout: 5000
+    }
+  };
+  
+  return config[mode] || config.development;
+};
+
 export default {
   getInitialData,
   getApiBaseUrl,
   getApiUrl,
-  getAuthHeaders
+  getAuthHeaders,
+  getProgramId,
+  getApiConfig
 };

@@ -3,7 +3,7 @@
  * Handles all API calls for the installation flow
  */
 
-import { getApiUrl, getAuthHeaders } from './apiConfig';
+import { getApiUrl, getAuthHeaders, getProgramId, getApiConfig } from './apiConfig';
 import MockAPIService from './mockApiService';
 
 /**
@@ -11,6 +11,77 @@ import MockAPIService from './mockApiService';
  */
 const useMockAPI = () => {
   return typeof window !== 'undefined' && window.__USE_MOCK_API__ === true;
+};
+
+/**
+ * Check zipcode with new API endpoint
+ * @param {string} zipcode - 5 digit zipcode
+ * @returns {Promise<Object>} Response with locations array containing company details
+ */
+export const checkZipcodeByAPI = async (zipcode) => {
+  if (useMockAPI()) {
+    return MockAPIService.checkZipcodeByAPI(zipcode);
+  }
+
+  try {
+    const response = await fetch('/api/installers/by-zipcode', {
+      method: 'POST',
+      headers: {
+        ...getAuthHeaders(),
+        'accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        zipcode: zipcode,
+        programId: getProgramId()
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('API Response:', data);
+    
+    // Handle different response formats
+    let installers = [];
+    
+    // If data is already an array of installers
+    if (Array.isArray(data)) {
+      installers = data;
+    }
+    // If data is an object with a locations or installers property
+    else if (data && typeof data === 'object') {
+      if (Array.isArray(data.locations)) {
+        installers = data.locations;
+      } else if (Array.isArray(data.installers)) {
+        installers = data.installers;
+      } else if (Array.isArray(data.data)) {
+        installers = data.data;
+      }
+    }
+    
+    // Validate that we have an array of installers
+    if (!Array.isArray(installers)) {
+      console.error('Invalid API response format. Expected array of installers.');
+      throw new Error('Invalid API response format');
+    }
+    
+    // Transform the response to match expected format
+    return {
+      locations: installers.map(installer => ({
+        lat: installer.latitude || installer.lat || 0,
+        lng: installer.longitude || installer.lng || 0,
+        member_id: installer.memberId || installer.member_id || 0,
+        name: installer.companyName || installer.name || 'Unknown Company',
+        distance: installer.distance || 'Unknown Distance'
+      }))
+    };
+  } catch (error) {
+    console.error('Zipcode check by API failed:', error);
+    throw error; // Don't fallback to mock data, let the error propagate
+  }
 };
 
 /**
@@ -51,16 +122,21 @@ export const getYears = async () => {
   }
 
   try {
-    const response = await fetch(getApiUrl('/get-year'), {
+    const response = await fetch('/api/vehicles/years', {
       method: 'GET',
-      headers: getAuthHeaders()
+      headers: {
+        ...getAuthHeaders(),
+        'accept': 'application/json'
+      }
     });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log('Vehicle years data:', data);
+    return data;
   } catch (error) {
     console.error('Get years failed:', error);
     throw error;
@@ -78,16 +154,21 @@ export const getMakes = async (year) => {
   }
 
   try {
-    const response = await fetch(getApiUrl(`/get-make?year=${year}`), {
+    const response = await fetch(`/api/vehicles/makes?year=${year}`, {
       method: 'GET',
-      headers: getAuthHeaders()
+      headers: {
+        ...getAuthHeaders(),
+        'accept': 'application/json'
+      }
     });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log(`Vehicle makes for year ${year}:`, data);
+    return data;
   } catch (error) {
     console.error('Get makes failed:', error);
     throw error;
@@ -106,16 +187,21 @@ export const getModels = async (year, make) => {
   }
 
   try {
-    const response = await fetch(getApiUrl(`/get-model?year=${year}&make=${make}`), {
+    const response = await fetch(`/api/vehicles/models?year=${year}&make=${make}`, {
       method: 'GET',
-      headers: getAuthHeaders()
+      headers: {
+        ...getAuthHeaders(),
+        'accept': 'application/json'
+      }
     });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log(`Vehicle models for year ${year} and make ${make}:`, data);
+    return data;
   } catch (error) {
     console.error('Get models failed:', error);
     throw error;
@@ -133,16 +219,21 @@ export const getTypes = async (model) => {
   }
 
   try {
-    const response = await fetch(getApiUrl(`/get-type?model=${model}`), {
+    const response = await fetch(`/api/vehicles/types?model=${model}`, {
       method: 'GET',
-      headers: getAuthHeaders()
+      headers: {
+        ...getAuthHeaders(),
+        'accept': 'application/json'
+      }
     });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log(`Vehicle types for model ${model}:`, data);
+    return data;
   } catch (error) {
     console.error('Get types failed:', error);
     throw error;
@@ -179,6 +270,7 @@ export const addToCart = async (cartData) => {
 
 export default {
   checkZipcode,
+  checkZipcodeByAPI,
   getYears,
   getMakes,
   getModels,
