@@ -1,12 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Map from '../Map/Map';
 import './StepLocation.css';
 
 const StepLocation = ({ locations, onNext, onBack, onClose }) => {
   const [selectedMemberId, setSelectedMemberId] = useState(null);
+  const locationListRef = useRef(null);
+  const locationCardRefs = useRef({});
 
   const handleLocationSelect = (memberId) => {
     setSelectedMemberId(memberId);
+    
+    // Scroll to the selected location card after a short delay to ensure DOM update
+    setTimeout(() => {
+      if (locationCardRefs.current[memberId] && locationListRef.current) {
+        locationCardRefs.current[memberId].scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+      }
+    }, 100);
   };
 
   const handleContinue = () => {
@@ -33,17 +45,18 @@ const StepLocation = ({ locations, onNext, onBack, onClose }) => {
         </div>
 
         {/* Right Side: Location List */}
-        <div className="location-list-section">
+        <div className="location-list-section" ref={locationListRef}>
           <div className="location-list">
             {locations.map((location) => (
               <div 
                 key={location.member_id}
+                ref={el => locationCardRefs.current[location.member_id] = el}
                 className={`location-card ${selectedMemberId === location.member_id ? 'selected' : ''}`}
                 onClick={() => handleLocationSelect(location.member_id)}
               >
                 <div className="location-info">
-                  <h4>{location.name || `Service Center ${location.member_id}`}</h4>
-                  <p>{location.address || `Member ID: ${location.member_id}`}</p>
+                  <h4>{location.city || 'Unknown City'}</h4>
+                  {location.address && <p>{location.address}</p>}
                   {location.distance && <p className="distance-info">Distance: {location.distance}</p>}
                 </div>
                 {selectedMemberId === location.member_id && (

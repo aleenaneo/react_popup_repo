@@ -4,18 +4,22 @@
  * Use this for local development and testing
  */
 
-// Mock data
+// Mock data for US locations
 const MOCK_LOCATIONS = [
-  { lat: "28.6139", lng: "77.2090", member_id: 1001, name: "Downtown Auto Center", address: "123 Main St, New Delhi" },
-  { lat: "28.7041", lng: "77.1025", member_id: 1002, name: "North Side Garage", address: "456 North Ave, New Delhi" },
-  { lat: "28.5355", lng: "77.3910", member_id: 1003, name: "East End Customs", address: "789 East Rd, Noida" }
+  { lat: "40.7128", lng: "-74.0060", member_id: 1001, name: "Downtown Auto Center", address: "123 Main St, New York, NY", city: "New York" },
+  { lat: "40.7589", lng: "-73.9851", member_id: 1002, name: "Times Square Garage", address: "1 Times Square, New York, NY", city: "New York" },
+  { lat: "40.6892", lng: "-74.0445", member_id: 1003, name: "Brooklyn Service Center", address: "123 Brooklyn Ave, Brooklyn, NY", city: "Brooklyn" },
+  { lat: "34.0522", lng: "-118.2437", member_id: 1004, name: "LA Auto Specialists", address: "456 Hollywood Blvd, Los Angeles, CA", city: "Los Angeles" },
+  { lat: "41.8781", lng: "-87.6298", member_id: 1005, name: "Chicago Windy City Repairs", address: "789 Michigan Ave, Chicago, IL", city: "Chicago" }
 ];
 
-// Mock data for new API format
+// Mock data for new API format with US locations
 const MOCK_INSTALLERS = [
-  { latitude: "28.6139", longitude: "77.2090", memberId: 1001, companyName: "Downtown Auto Center", distance: "2.5 miles" },
-  { latitude: "28.7041", longitude: "77.1025", memberId: 1002, companyName: "North Side Garage", distance: "5.2 miles" },
-  { latitude: "28.5355", longitude: "77.3910", memberId: 1003, companyName: "East End Customs", distance: "3.8 miles" }
+  { latitude: "40.7128", longitude: "-74.0060", memberId: 1001, companyName: "Downtown Auto Center", distance: "2.5 miles", city: "New York" },
+  { latitude: "40.7589", longitude: "-73.9851", memberId: 1002, companyName: "Times Square Garage", distance: "5.2 miles", city: "New York" },
+  { latitude: "40.6892", longitude: "-74.0445", memberId: 1003, companyName: "Brooklyn Service Center", distance: "3.8 miles", city: "Brooklyn" },
+  { latitude: "34.0522", longitude: "-118.2437", memberId: 1004, companyName: "LA Auto Specialists", distance: "1.2 miles", city: "Los Angeles" },
+  { latitude: "41.8781", longitude: "-87.6298", memberId: 1005, companyName: "Chicago Windy City Repairs", distance: "0.8 miles", city: "Chicago" }
 ];
 
 const MOCK_YEARS = ["2020", "2021", "2022", "2023", "2024"];
@@ -76,7 +80,8 @@ export const MockAPIService = {
         lng: installer.longitude,
         member_id: installer.memberId,
         name: installer.companyName,
-        distance: installer.distance
+        distance: installer.distance,
+        city: installer.city
       }))
     };
   },

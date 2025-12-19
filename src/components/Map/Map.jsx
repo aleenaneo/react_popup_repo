@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import { useMemo } from 'react';
 import 'leaflet/dist/leaflet.css';
 import './Map.css';
 
@@ -11,6 +12,20 @@ L.Icon.Default.mergeOptions({
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 });
+
+// Custom icons for selected/unselected markers
+const getMarkerIcon = (isSelected) => {
+  return new L.Icon({
+    iconUrl: isSelected 
+      ? 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png'
+      : 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+};
 
 // Component to fit bounds when locations change
 const FitBounds = ({ locations }) => {
@@ -46,9 +61,13 @@ const MapController = ({ selectedMemberId, locations }) => {
 };
 
 const Map = ({ locations, onLocationSelect, selectedMemberId }) => {
+  // Calculate average center of all locations for better map positioning
   const defaultCenter = locations && locations.length > 0
-    ? [parseFloat(locations[0].lat), parseFloat(locations[0].lng)]
-    : [28.6139, 77.2090]; // Default to Delhi, India
+    ? [
+        locations.reduce((sum, loc) => sum + parseFloat(loc.lat), 0) / locations.length,
+        locations.reduce((sum, loc) => sum + parseFloat(loc.lng), 0) / locations.length
+      ]
+    : [39.8283, -98.5795]; // Default to center of USA
 
   if (!locations || locations.length === 0) {
     return (
@@ -66,14 +85,14 @@ const Map = ({ locations, onLocationSelect, selectedMemberId }) => {
         center={defaultCenter}
         zoom={13}
         style={{ height: '100%', width: '100%', borderRadius: '12px' }}
-        zoomControl={false}
-        scrollWheelZoom={false}
-        doubleClickZoom={false}
-        touchZoom={false}
-        dragging={false} 
+        zoomControl={true}
+        scrollWheelZoom={true}
+        doubleClickZoom={true}
+        touchZoom={true}
+        dragging={true} 
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attribution=''
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <FitBounds locations={locations} />
@@ -82,6 +101,7 @@ const Map = ({ locations, onLocationSelect, selectedMemberId }) => {
           <Marker
             key={index}
             position={[parseFloat(location.lat), parseFloat(location.lng)]}
+            icon={getMarkerIcon(selectedMemberId === location.member_id)}
             eventHandlers={{
               click: () => onLocationSelect(location.member_id)
             }}

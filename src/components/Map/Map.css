@@ -8,6 +8,19 @@
     margin-bottom: 0;
 }
 
+/* Hide all Leaflet control elements */
+.map-container .leaflet-control-attribution {
+    display: none !important;
+}
+
+.map-container .leaflet-control {
+    display: none !important;
+}
+
+.map-container .leaflet-bar {
+    display: none !important;
+}
+
 .map-empty {
     height: 100%;
     min-height: 400px;

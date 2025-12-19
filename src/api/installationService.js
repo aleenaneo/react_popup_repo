@@ -75,7 +75,8 @@ export const checkZipcodeByAPI = async (zipcode) => {
         lng: installer.longitude || installer.lng || 0,
         member_id: installer.memberId || installer.member_id || 0,
         name: installer.companyName || installer.name || 'Unknown Company',
-        distance: installer.distance || 'Unknown Distance'
+        distance: installer.distance || 'Unknown Distance',
+        city: installer.city || 'Unknown City'
       }))
     };
   } catch (error) {
