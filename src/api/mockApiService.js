@@ -18,7 +18,7 @@ const MOCK_INSTALLERS = [
   { latitude: "40.7128", longitude: "-74.0060", memberId: 1001, companyName: "Downtown Auto Center", distance: "2.5 miles", city: "New York" },
   { latitude: "40.7589", longitude: "-73.9851", memberId: 1002, companyName: "Times Square Garage", distance: "5.2 miles", city: "New York" },
   { latitude: "40.6892", longitude: "-74.0445", memberId: 1003, companyName: "Brooklyn Service Center", distance: "3.8 miles", city: "Brooklyn" },
-  { latitude: "34.0522", longitude: "-118.2437", memberId: 1004, companyName: "LA Auto Specialists", distance: "1.2 miles", city: "Los Angeles" },
+  { latitude: "34.0522", lon: "-118.2437", memberId: 1004, companyName: "LA Auto Specialists", distance: "1.2 miles", city: "Los Angeles" }, // Using 'lon' instead of 'longitude'
   { latitude: "41.8781", longitude: "-87.6298", memberId: 1005, companyName: "Chicago Windy City Repairs", distance: "0.8 miles", city: "Chicago" }
 ];
 
@@ -76,8 +76,8 @@ export const MockAPIService = {
     // Transform to match expected format
     return {
       locations: MOCK_INSTALLERS.map(installer => ({
-        lat: installer.latitude,
-        lng: installer.longitude,
+        lat: parseFloat(installer.latitude),
+        lng: parseFloat(installer.longitude || installer.lon || 0),
         member_id: installer.memberId,
         name: installer.companyName,
         distance: installer.distance,

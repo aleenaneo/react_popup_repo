@@ -71,8 +71,8 @@ export const checkZipcodeByAPI = async (zipcode) => {
     // Transform the response to match expected format
     return {
       locations: installers.map(installer => ({
-        lat: installer.latitude || installer.lat || 0,
-        lng: installer.longitude || installer.lng || 0,
+        lat: parseFloat(installer.latitude || installer.lat || 0),
+        lng: parseFloat(installer.longitude || installer.lng || installer.lon || 0),
         member_id: installer.memberId || installer.member_id || 0,
         name: installer.companyName || installer.name || 'Unknown Company',
         distance: installer.distance || 'Unknown Distance',
