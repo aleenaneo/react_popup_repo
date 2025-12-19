@@ -21,6 +21,7 @@
 .form-group {
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .form-group select {
@@ -60,6 +61,9 @@
     margin-top: 12px;
     width: 100%;
 }
+
+/* Note: Native select dropdown positioning is limited by browser implementation.
+   For full control over dropdown positioning, a custom dropdown component would be needed. */
 
 @media (max-width: 640px) {
     .step-actions {

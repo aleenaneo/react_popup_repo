@@ -15,6 +15,7 @@ function App() {
     const initialData = getInitialData();
     if (initialData.mode === 'development' || initialData.mode === 'local') {
       // Disable mock mode to use real API
+      disableMockMode();
       console.log('🔌 Real API mode enabled');
     }
 

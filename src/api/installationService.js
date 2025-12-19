@@ -135,8 +135,20 @@ export const getYears = async () => {
     }
 
     const data = await response.json();
-    console.log('Vehicle years data:', data);
-    return data;
+    console.log('Raw vehicle years data from API:', data);
+    
+    // Process the data to ensure it's in the correct format
+    let processedData = [];
+    if (Array.isArray(data)) {
+      processedData = data;
+    } else if (data && typeof data === 'object' && Array.isArray(data.years)) {
+      processedData = data.years;
+    } else if (data && typeof data === 'object' && Array.isArray(data.data)) {
+      processedData = data.data;
+    }
+    
+    console.log('Processed vehicle years data:', processedData);
+    return processedData;
   } catch (error) {
     console.error('Get years failed:', error);
     throw error;
@@ -154,6 +166,7 @@ export const getMakes = async (year) => {
   }
 
   try {
+    console.log(`Fetching vehicle makes for year: ${year}`);
     const response = await fetch(`/api/vehicles/makes?year=${year}`, {
       method: 'GET',
       headers: {
@@ -167,8 +180,28 @@ export const getMakes = async (year) => {
     }
 
     const data = await response.json();
-    console.log(`Vehicle makes for year ${year}:`, data);
-    return data;
+    console.log(`Raw vehicle makes for year ${year}:`, data);
+    console.log(`Type of raw data:`, typeof data);
+    console.log(`Is raw data an array:`, Array.isArray(data));
+    
+    // Process the data to ensure it's in the correct format
+    let processedData = [];
+    if (Array.isArray(data)) {
+      processedData = data;
+      console.log(`Direct array data, length:`, data.length);
+    } else if (data && typeof data === 'object' && Array.isArray(data.makes)) {
+      processedData = data.makes;
+      console.log(`Data has makes array, length:`, data.makes.length);
+    } else if (data && typeof data === 'object' && Array.isArray(data.data)) {
+      processedData = data.data;
+      console.log(`Data has data array, length:`, data.data.length);
+    } else {
+      console.log(`Unexpected data format, using empty array`);
+    }
+    
+    console.log(`Processed vehicle makes for year ${year}:`, processedData);
+    console.log(`First few processed items:`, processedData.slice(0, 3));
+    return processedData;
   } catch (error) {
     console.error('Get makes failed:', error);
     throw error;
@@ -187,7 +220,10 @@ export const getModels = async (year, make) => {
   }
 
   try {
-    const response = await fetch(`/api/vehicles/models?year=${year}&make=${make}`, {
+    console.log(`Fetching vehicle models for year: ${year} and make: ${make}`);
+    // The API expects makeID instead of make name
+    // We need to pass the make ID, not the make name
+    const response = await fetch(`/api/vehicles/models?year=${year}&makeID=${make}`, {
       method: 'GET',
       headers: {
         ...getAuthHeaders(),
@@ -200,8 +236,28 @@ export const getModels = async (year, make) => {
     }
 
     const data = await response.json();
-    console.log(`Vehicle models for year ${year} and make ${make}:`, data);
-    return data;
+    console.log(`Raw vehicle models for year ${year} and make ${make}:`, data);
+    console.log(`Type of raw data:`, typeof data);
+    console.log(`Is raw data an array:`, Array.isArray(data));
+    
+    // Process the data to ensure it's in the correct format
+    let processedData = [];
+    if (Array.isArray(data)) {
+      processedData = data;
+      console.log(`Direct array data, length:`, data.length);
+    } else if (data && typeof data === 'object' && Array.isArray(data.models)) {
+      processedData = data.models;
+      console.log(`Data has models array, length:`, data.models.length);
+    } else if (data && typeof data === 'object' && Array.isArray(data.data)) {
+      processedData = data.data;
+      console.log(`Data has data array, length:`, data.data.length);
+    } else {
+      console.log(`Unexpected data format, using empty array`);
+    }
+    
+    console.log(`Processed vehicle models for year ${year} and make ${make}:`, processedData);
+    console.log(`First few processed items:`, processedData.slice(0, 3));
+    return processedData;
   } catch (error) {
     console.error('Get models failed:', error);
     throw error;
