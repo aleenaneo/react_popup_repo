@@ -75,12 +75,32 @@ const StepSchedule = ({ onNext, onBack, onClose, initialAppointment = {} }) => {
       dateToCheck.setHours(0, 0, 0, 0);
       
       const isAvailable = dateToCheck >= startDate;
+      
+      // Calculate if this date is within the 8-day window before availability
+      const endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() - 1); // Last unavailable date
+      const startDateWindow = new Date(endDate);
+      startDateWindow.setDate(startDateWindow.getDate() - 7); // First of the 8 days
+      
+      const isInEightDayWindow = dateToCheck >= startDateWindow && dateToCheck <= endDate;
+      
       const isSelected = appointment.date === `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      
+      // Determine the appropriate class based on date availability
+      let dayClass = 'calendar-day';
+      if (isSelected) {
+        dayClass += ' selected';
+      } else if (isInEightDayWindow) {
+        // Apply dark color to the 8 days before available dates
+        dayClass += ' eight-day-window';
+      } else if (!isAvailable) {
+        dayClass += ' disabled';
+      }
       
       grid.push(
         <button
           key={day}
-          className={`calendar-day ${!isAvailable ? 'disabled' : ''} ${isSelected ? 'selected' : ''}`}
+          className={dayClass}
           onClick={() => isAvailable && handleDateSelect(day)}
           disabled={!isAvailable}
         >
@@ -186,7 +206,7 @@ const StepSchedule = ({ onNext, onBack, onClose, initialAppointment = {} }) => {
           onClick={handleNext}
           disabled={!isFormComplete}
         >
-          Proceed
+          Continue
         </button>
       </div>
     </div>

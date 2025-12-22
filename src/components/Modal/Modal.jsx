@@ -17,14 +17,10 @@ const Modal = ({ isOpen, onClose, children, title }) => {
 
   if (!isOpen) return null;
 
-  const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
+  // Removed backdrop click handler to prevent closing modal when clicking outside
 
   return (
-    <div className="modal-backdrop" onClick={handleBackdropClick}>
+    <div className="modal-backdrop">
       <div className="modal-container">
         <div className="modal-header">
           {title && <h2 className="modal-title">{title}</h2>}

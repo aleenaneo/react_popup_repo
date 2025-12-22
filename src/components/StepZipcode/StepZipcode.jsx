@@ -88,7 +88,7 @@ const StepZipcode = ({ onSuccess, onBack, onClose }) => {
               Checking...
             </>
           ) : (
-            'Proceed'
+            'Continue'
           )}
         </button>
       </div>

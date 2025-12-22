@@ -80,7 +80,7 @@ const StepLocation = ({ locations, onNext, onBack, onClose }) => {
           onClick={handleContinue}
           disabled={!selectedMemberId}
         >
-          Proceed
+          Continue
         </button>
       </div>
     </div>

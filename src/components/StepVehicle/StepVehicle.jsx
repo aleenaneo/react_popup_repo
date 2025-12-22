@@ -317,7 +317,7 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {} }) => {
           onClick={handleNext}
           disabled={!isFormComplete}
         >
-          Proceed
+          Continue
         </button>
       </div>
     </div>

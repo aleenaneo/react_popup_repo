@@ -102,9 +102,18 @@
 }
 
 .calendar-day.disabled {
-    background: #808080;
+    background: #a19e9e;
     color: #ccc;
     cursor: not-allowed;
+}
+
+.calendar-day.eight-day-window {
+    background: #808080 !important;
+    color: #ffffff;
+}
+
+.calendar-day .empty{
+    background: #c7a1a1 !important;
 }
 
 /* Right Side Options */
