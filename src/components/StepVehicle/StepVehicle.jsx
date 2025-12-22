@@ -209,6 +209,15 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {} }) => {
 
   const isFormComplete = vehicle.year && vehicle.make && vehicle.model;
 
+  // Loading indicator component
+  const LoadingSelect = ({ label }) => (
+    <div className="form-group">
+      <select disabled>
+        <option>{label}</option>
+      </select>
+    </div>
+  );
+
   return (
     <div className="step-vehicle">
       <div className="step-header">
@@ -218,88 +227,100 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {} }) => {
       <div className="vehicle-form">
         {/* Year Dropdown */}
         <div className="form-group">
-          <select
-            id="year"
-            value={vehicle.year}
-            onChange={(e) => handleChange('year', e.target.value)}
-            disabled={loading.years}
-          >
-            <option value="">Select Year</option>
-            {[...options.years].reverse().map((year, index) => {
-              // Handle both string/number years and object years
-              const yearValue = typeof year === 'object' ? year.year || year.yearID || year.id || JSON.stringify(year) : year;
-              const yearDisplay = typeof year === 'object' ? year.year || year.name || yearValue : year;
-              // Use a combination of value and index to ensure uniqueness
-              const yearKey = `${typeof year === 'object' ? year.year || year.yearID || year.id || index : year}-${index}`;
-              
-              return (
-                <option key={yearKey} value={yearValue}>
-                  {yearDisplay}
-                </option>
-              );
-            })}
-          </select>
+          {loading.years ? (
+            <LoadingSelect label="Loading years..." />
+          ) : (
+            <select
+              id="year"
+              value={vehicle.year}
+              onChange={(e) => handleChange('year', e.target.value)}
+              disabled={loading.years}
+            >
+              <option value="">Select Year</option>
+              {[...options.years].reverse().map((year, index) => {
+                // Handle both string/number years and object years
+                const yearValue = typeof year === 'object' ? year.year || year.yearID || year.id || JSON.stringify(year) : year;
+                const yearDisplay = typeof year === 'object' ? year.year || year.name || yearValue : year;
+                // Use a combination of value and index to ensure uniqueness
+                const yearKey = `${typeof year === 'object' ? year.year || year.yearID || year.id || index : year}-${index}`;
+                
+                return (
+                  <option key={yearKey} value={yearValue}>
+                    {yearDisplay}
+                  </option>
+                );
+              })}
+            </select>
+          )}
         </div>
 
         {/* Make Dropdown */}
         <div className="form-group">
-          <select
-            id="make"
-            value={typeof vehicle.make === 'object' ? vehicle.make.make || vehicle.make.makeID || '' : vehicle.make}
-            onChange={(e) => {
-              // Find the selected make object from options
-              const selectedMake = options.makes.find(make => {
-                if (typeof make === 'object') {
-                  return make.make === e.target.value || make.makeID == e.target.value || make.id == e.target.value;
-                }
-                return make === e.target.value;
-              });
-              
-              // Pass the full object if found, otherwise pass the value
-              handleChange('make', selectedMake || e.target.value);
-            }}
-            disabled={!vehicle.year || loading.makes}
-          >
-            <option value="">Select Make</option>
-            {[...options.makes].reverse().map((make, index) => {
-              // Handle both string/number makes and object makes
-              const makeValue = typeof make === 'object' ? make.make || make.makeID || make.id || JSON.stringify(make) : make;
-              const makeDisplay = typeof make === 'object' ? make.make || make.name || makeValue : make;
-              // Use a combination of value and index to ensure uniqueness
-              const makeKey = `${typeof make === 'object' ? make.make || make.makeID || make.id || index : make}-${index}`;
-              
-              return (
-                <option key={makeKey} value={makeValue}>
-                  {makeDisplay}
-                </option>
-              );
-            })}
-          </select>
+          {loading.makes ? (
+            <LoadingSelect label="Loading makes..." />
+          ) : (
+            <select
+              id="make"
+              value={typeof vehicle.make === 'object' ? vehicle.make.make || vehicle.make.makeID || '' : vehicle.make}
+              onChange={(e) => {
+                // Find the selected make object from options
+                const selectedMake = options.makes.find(make => {
+                  if (typeof make === 'object') {
+                    return make.make === e.target.value || make.makeID == e.target.value || make.id == e.target.value;
+                  }
+                  return make === e.target.value;
+                });
+                
+                // Pass the full object if found, otherwise pass the value
+                handleChange('make', selectedMake || e.target.value);
+              }}
+              disabled={!vehicle.year || loading.makes}
+            >
+              <option value="">Select Make</option>
+              {[...options.makes].reverse().map((make, index) => {
+                // Handle both string/number makes and object makes
+                const makeValue = typeof make === 'object' ? make.make || make.makeID || make.id || JSON.stringify(make) : make;
+                const makeDisplay = typeof make === 'object' ? make.make || make.name || makeValue : make;
+                // Use a combination of value and index to ensure uniqueness
+                const makeKey = `${typeof make === 'object' ? make.make || make.makeID || make.id || index : make}-${index}`;
+                
+                return (
+                  <option key={makeKey} value={makeValue}>
+                    {makeDisplay}
+                  </option>
+                );
+              })}
+            </select>
+          )}
         </div>
 
         {/* Model Dropdown */}
         <div className="form-group">
-          <select
-            id="model"
-            value={vehicle.model}
-            onChange={(e) => handleChange('model', e.target.value)}
-            disabled={!vehicle.year || !vehicle.make || loading.models}
-          >
-            <option value="">Select Model</option>
-            {[...options.models].reverse().map((model, index) => {
-              // Handle both string/number models and object models
-              const modelValue = typeof model === 'object' ? model.model || model.modelID || model.id || JSON.stringify(model) : model;
-              const modelDisplay = typeof model === 'object' ? model.model || model.name || modelValue : model;
-              // Use a combination of value and index to ensure uniqueness
-              const modelKey = `${typeof model === 'object' ? model.model || model.modelID || model.id || index : model}-${index}`;
-              
-              return (
-                <option key={modelKey} value={modelValue}>
-                  {modelDisplay}
-                </option>
-              );
-            })}
-          </select>
+          {loading.models ? (
+            <LoadingSelect label="Loading models..." />
+          ) : (
+            <select
+              id="model"
+              value={vehicle.model}
+              onChange={(e) => handleChange('model', e.target.value)}
+              disabled={!vehicle.year || !vehicle.make || loading.models}
+            >
+              <option value="">Select Model</option>
+              {[...options.models].reverse().map((model, index) => {
+                // Handle both string/number models and object models
+                const modelValue = typeof model === 'object' ? model.model || model.modelID || model.id || JSON.stringify(model) : model;
+                const modelDisplay = typeof model === 'object' ? model.model || model.name || modelValue : model;
+                // Use a combination of value and index to ensure uniqueness
+                const modelKey = `${typeof model === 'object' ? model.model || model.modelID || model.id || index : model}-${index}`;
+                
+                return (
+                  <option key={modelKey} value={modelValue}>
+                    {modelDisplay}
+                  </option>
+                );
+              })}
+            </select>
+          )}
         </div>
 
 
