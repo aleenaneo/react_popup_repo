@@ -35,7 +35,7 @@ const StepLocation = ({ locations, onNext, onBack, onClose }) => {
       </div>
 
       <div className="location-layout">
-        {/* Left Side: Map */}
+        {/* Map Section */}
         <div className="location-map-section">
           <Map
             locations={locations}
@@ -44,7 +44,7 @@ const StepLocation = ({ locations, onNext, onBack, onClose }) => {
           />
         </div>
 
-        {/* Right Side: Location List */}
+        {/* Location List */}
         <div className="location-list-section" ref={locationListRef}>
           <div className="location-list">
             {locations.map((location) => (
