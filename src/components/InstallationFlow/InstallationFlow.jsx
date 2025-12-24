@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from '../Modal/Modal';
 import ProductBox from '../ProductBox/ProductBox';
 import StepZipcode from '../StepZipcode/StepZipcode';
@@ -7,6 +7,7 @@ import StepVehicle from '../StepVehicle/StepVehicle';
 import StepSchedule from '../StepSchedule/StepSchedule';
 import { addToCart } from '../../api/installationService';
 import { getInitialData } from '../../api/apiConfig';
+import { fetchRelatedProductsBySku } from '../../api/graphqlService';
 import './InstallationFlow.css';
 
 const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => {
@@ -31,6 +32,39 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
   const [includeInstallation, setIncludeInstallation] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [relatedProducts, setRelatedProducts] = useState([]);
+
+  // Get store logo from initial data
+  const initialData = getInitialData();
+  const storeLogo = initialData.store_logo || 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Nextbase_logo.svg/2560px-Nextbase_logo.svg.png'; // fallback to default if not provided
+
+  // Fetch related products when component mounts
+  useEffect(() => {
+    if (product && product.sku) {
+      const fetchRelated = async () => {
+        try {
+          const related = await fetchRelatedProductsBySku(product.sku);
+          setRelatedProducts(related);
+        } catch (err) {
+          console.error('Error fetching related products:', err);
+          setRelatedProducts([]);
+        }
+      };
+      fetchRelated();
+    }
+  }, [product]);
+
+  // Handle read more link click - use the path of the first related product if available
+  const handleReadMoreClick = (e) => {
+    e.preventDefault();
+    if (relatedProducts.length > 0 && relatedProducts[0].path) {
+      // Navigate to the related product path
+      window.open(relatedProducts[0].path, '_blank');
+    } else {
+      // Fallback behavior if no related product path is available
+      console.log('No related product path available');
+    }
+  };
 
   const handleContinueWithoutInstallation = async () => {
     // Add only the main product to cart
@@ -231,12 +265,12 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
         <div className="flow-header-section">
           <div className="intro-header">
             <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Nextbase_logo.svg/2560px-Nextbase_logo.svg.png" 
-              alt="NEXTBASE" 
+              src={storeLogo} 
+              alt="Store Logo" 
               className="intro-logo" 
             />
             <p>
-              Take the hassle out of installation and have your new Nextbase Dash Cam installed by our partners and their trained engineers at a time and location of your choice (Hardwire Kit included). <a href="#" className="read-more-link">Read more</a>
+              Take the hassle out of installation and have your new Nextbase Dash Cam installed by our partners and their trained engineers at a time and location of your choice (Hardwire Kit included). <a href="#" onClick={handleReadMoreClick} className="read-more-link">Read more</a>
             </p>
           </div>
 

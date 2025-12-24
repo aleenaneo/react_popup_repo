@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchRelatedProductsBySku } from '../../api/graphqlService';
+import { getInitialData } from '../../api/apiConfig';
 import './ProductBox.css';
 
 const ProductBox = ({ product, installationProduct, onToggleInstallation }) => {
@@ -20,8 +21,30 @@ const ProductBox = ({ product, installationProduct, onToggleInstallation }) => {
         setLoading(true);
         try {
           const relatedProductsData = await fetchRelatedProductsBySku(product.sku);
-          setRelatedProducts(relatedProductsData);
+          
+          // Get preferred SKUs from initial data
+          const initialData = getInitialData();
+          const preferredSkus = initialData.phf_product_skus ? initialData.phf_product_skus.split(',') : [];
+          
+          // Filter related products to find ones that match the preferred SKUs
+          let displayProducts = relatedProductsData;
+          
+          // If we have preferred SKUs, prioritize those
+          if (preferredSkus.length > 0) {
+            const preferredProducts = relatedProductsData.filter(rp => 
+              preferredSkus.some(prefSku => prefSku.trim() === rp.sku)
+            );
+            
+            // If we found preferred products, use the first one; otherwise use all related products
+            if (preferredProducts.length > 0) {
+              displayProducts = preferredProducts;
+            }
+          }
+          
+          setRelatedProducts(displayProducts);
           console.log('GraphQL Related Products Data:', relatedProductsData); // Log the fetched data
+          console.log('Preferred SKUs:', preferredSkus);
+          console.log('Filtered display products:', displayProducts);
         } catch (error) {
           console.error('Error fetching related products:', error);
           console.warn('CORS or network error may prevent direct GraphQL calls. Using fallback data.');
@@ -41,7 +64,7 @@ const ProductBox = ({ product, installationProduct, onToggleInstallation }) => {
 
   if (!product) return null;
 
-  // Use the first related product if available, otherwise fallback to main product
+  // Use the first product from filtered list (either preferred or all related)
   const displayProduct = relatedProducts.length > 0 ? relatedProducts[0] : product;
 
   // Debug the price values

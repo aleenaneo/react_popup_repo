@@ -88,6 +88,7 @@ export const fetchProductBySku = async (sku) => {
             node {
               id
               name
+              path
               sku
               prices {
                 salePrice {
