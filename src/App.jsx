@@ -23,13 +23,14 @@ function App() {
     const type = detectPageType();
     setPageType(type);
 
-    // Set up demo product data
+    // Set up demo product data - now using SKU from initial data
     setProductData({
       id: initialData.product_id_th || '123',
       name: 'Premium Car Tires (Set of 4)',
       price: '299.99',
       currency: initialData.currency_code || 'USD',
-      image: 'https://via.placeholder.com/400x400/007bff/ffffff?text=Car+Tires'
+      image: 'https://via.placeholder.com/400x400/007bff/ffffff?text=Car+Tires',
+      sku: initialData.product_sku || 'NBIQ'  // Get SKU from initial data
     });
 
     // Attach event listeners to theme buttons

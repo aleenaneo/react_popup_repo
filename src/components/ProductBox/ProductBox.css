@@ -36,6 +36,13 @@
     background: #f8f9fa;
 }
 
+.product-icon-image {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
 .product-details {
     flex: 1;
     display: flex;

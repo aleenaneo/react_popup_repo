@@ -1,43 +1,98 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { fetchRelatedProductsBySku } from '../../api/graphqlService';
 import './ProductBox.css';
 
 const ProductBox = ({ product, installationProduct, onToggleInstallation }) => {
   const [isInstallationAdded, setIsInstallationAdded] = useState(false);
-
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  
   const handleToggle = () => {
     const newState = !isInstallationAdded;
     setIsInstallationAdded(newState);
     onToggleInstallation(newState);
   };
 
+  // Fetch related products using GraphQL when the component mounts
+  useEffect(() => {
+    const fetchRelatedProducts = async () => {
+      if (product && product.sku) { // assuming product has a sku field
+        setLoading(true);
+        try {
+          const relatedProductsData = await fetchRelatedProductsBySku(product.sku);
+          setRelatedProducts(relatedProductsData);
+          console.log('GraphQL Related Products Data:', relatedProductsData); // Log the fetched data
+        } catch (error) {
+          console.error('Error fetching related products:', error);
+          console.warn('CORS or network error may prevent direct GraphQL calls. Using fallback data.');
+          // Fallback to empty array if GraphQL fails
+          setRelatedProducts([]);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        // If no SKU is provided, use empty array
+        setRelatedProducts([]);
+      }
+    };
+    
+    fetchRelatedProducts();
+  }, [product]);
+
   if (!product) return null;
 
-  // Use installation product details if available, otherwise fallback (though this appears to be an installation-specific card)
-  const displayPrice = installationProduct ? installationProduct.price : product.price;
-  const currency = installationProduct ? installationProduct.currency : product.currency;
+  // Use the first related product if available, otherwise fallback to main product
+  const displayProduct = relatedProducts.length > 0 ? relatedProducts[0] : product;
+
+  // Debug the price values
+  console.log('Installation product price:', installationProduct?.price);
+  console.log('Related product prices:', displayProduct?.prices);
+  console.log('Sale price value:', displayProduct?.prices?.salePrice?.value);
+  console.log('Base price value:', displayProduct?.prices?.basePrice?.value);
+  console.log('Fallback product price:', product?.price);
+  
+  // Price display logic: salePrice.value → basePrice.value → fallback product price
+  // Currency logic: salePrice.currencyCode → basePrice.currencyCode → fallback currency
+  const displayPrice = displayProduct?.prices?.salePrice?.value || 
+                      displayProduct?.prices?.basePrice?.value || 
+                      displayProduct?.price || 
+                      product.price;
+  const currency = displayProduct?.prices?.salePrice?.currencyCode || 
+                  displayProduct?.prices?.basePrice?.currencyCode || 
+                  displayProduct?.currency || 
+                  product.currency;
+  
+  // Use related product details if available, otherwise use main product data
+  const productName = displayProduct?.name || product.name;
+  const productImage = displayProduct?.images?.edges?.[0]?.node?.urlOriginal || displayProduct?.image || product.image;
 
   return (
     <div className={`product-box ${isInstallationAdded ? 'selected' : ''}`}>
-      {/* Icon Section */}
+      {/* Icon Section - Use product image if available, otherwise use default SVG */}
       <div className="product-icon-wrapper">
-        <div className="product-icon-circle">
+        {productImage ? (
+          <img src={productImage} alt={productName} className="product-icon-image" />
+        ) : (
+          <div className="product-icon-circle">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <circle cx="12" cy="7" r="4" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Details Section */}
       <div className="product-details">
-        <h3 className="product-title">Professional installation</h3>
+        <h3 className="product-title">{productName}</h3>
         <p className="product-subtitle">(Includes hardwire kit)</p>
       </div>
 
-      {/* Price & Action Section */}
+      {/* Price & Action Section - Uses GraphQL base price currency code and value when sale price is null */}
       <div className="product-actions">
         <div className="product-price">
-            {currency}{displayPrice}
+            {/* Price display logic: salePrice.value → basePrice.value → fallback product price */}
+            {loading ? 'Loading...' : `${currency}${displayPrice}`}
         </div>
         <button 
           className={`action-button ${isInstallationAdded ? 'added' : 'add'}`}
