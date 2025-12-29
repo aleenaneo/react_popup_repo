@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getYears, getMakes, getModels, getTypes } from '../../api/installationService';
 import './StepVehicle.css';
 
-const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {} }) => {
+const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {}, product, relatedProducts, selectedLocation }) => {
   const [vehicle, setVehicle] = useState({
     year: initialVehicle.year || '',
     make: initialVehicle.make || '',
@@ -203,6 +203,13 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {} }) => {
 
   const handleNext = () => {
     if (vehicle.year && vehicle.make && vehicle.model) {
+      // Log main product, related products, selected location details, and vehicle details
+      console.log('=== VEHICLE STEP CONTINUE BUTTON CLICKED ===');
+      console.log('Main Product:', product || 'No product data');
+      console.log('Related Products:', relatedProducts || 'No related products');
+      console.log('Selected Location Details:', selectedLocation || 'No location selected');
+      console.log('Vehicle Details:', vehicle);
+      
       onNext(vehicle);
     }
   };

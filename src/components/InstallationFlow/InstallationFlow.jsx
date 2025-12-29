@@ -43,6 +43,7 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
     if (product && product.sku) {
       const fetchRelated = async () => {
         try {
+          // Fetch related products using the default currency from config
           const related = await fetchRelatedProductsBySku(product.sku);
           setRelatedProducts(related);
         } catch (err) {
@@ -250,6 +251,9 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
             onBack={handleBack}
             onClose={handleClose}
             initialVehicle={flowData.vehicle}
+            product={product}
+            relatedProducts={relatedProducts}
+            selectedLocation={flowData.selectedLocation}
           />
         );
 

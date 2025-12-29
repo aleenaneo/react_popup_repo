@@ -1,25 +1,20 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+// Get BigCommerce store URL from environment variables or use default
+const BIGCOMMERCE_STORE_URL = process.env.BIGCOMMERCE_STORE_URL || 'https://store-5o7xzmxoo0.mybigcommerce.com';
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
     port: 3005,
     proxy: {
+      // General proxy rule for other API endpoints (non-GraphQL)
       '/api': {
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false
-      },
-      '/api/proxy-graphql': {
-        target: 'https://store-5o7xzmxoo0.mybigcommerce.com',
-        changeOrigin: true,
-        secure: true,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
       }
     }
   },

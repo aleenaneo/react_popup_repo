@@ -3,7 +3,7 @@
  * Handles all GraphQL API calls for product data
  */
 
-import { getInitialData } from './apiConfig';
+import { getInitialData, getApiUrl, getGraphQlEndpoint } from './apiConfig';
 
 /**
  * Executes a GraphQL query against the BigCommerce GraphQL API
@@ -14,18 +14,27 @@ import { getInitialData } from './apiConfig';
 export const executeGraphQLQuery = async (query, variables = {}) => {
   const { token, endpoint } = getInitialData();
   
-  // Check if endpoint is a full URL (external) or relative path
-  const isExternalEndpoint = endpoint.startsWith('http');
-  const requestUrl = endpoint; // Use the actual endpoint URL
+  const requestUrl = getGraphQlEndpoint(); // Use the GraphQL endpoint from API config
+  
+  // Log the request URL for debugging
+  console.log(`GraphQL Request: ${requestUrl}`);
   
   try {
+    // For development mode, we might not have a token from BigCommerce
+    // so we don't include the Authorization header for proxy requests
+    const headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    };
+    
+    // Only add Authorization header if we have a token and we're not using the proxy
+    if (token && !requestUrl.includes('/api/proxy-graphql')) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
     const response = await fetch(requestUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
-      },
+      headers: headers,
       body: JSON.stringify({
         query,
         variables
@@ -55,9 +64,19 @@ export const executeGraphQLQuery = async (query, variables = {}) => {
  * @param {string} sku - Product SKU
  * @returns {Promise<Object>} Product details
  */
-export const fetchProductBySku = async (sku) => {
+export const fetchProductBySku = async (sku, currencyCode) => {
+  // Use currency code from config if not provided
+  const configCurrencyCode = getInitialData().currency_code || 'USD';
+  const finalCurrencyCode = currencyCode || configCurrencyCode;
+  
   const query = `query productDetails {
     site {
+      currency(currencyCode: ${finalCurrencyCode}) {
+            name
+            display {
+              symbol
+            }
+    }
       product(sku: "${sku}") {
         addToCartUrl
         images {
@@ -129,8 +148,12 @@ export const fetchProductBySku = async (sku) => {
  * @param {string} sku - Product SKU
  * @returns {Promise<Array>} Related products
  */
-export const fetchRelatedProductsBySku = async (sku) => {
-  const product = await fetchProductBySku(sku);
+export const fetchRelatedProductsBySku = async (sku, currencyCode) => {
+  // Use currency code from config if not provided
+  const configCurrencyCode = getInitialData().currency_code || 'USD';
+  const finalCurrencyCode = currencyCode || configCurrencyCode;
+  
+  const product = await fetchProductBySku(sku, finalCurrencyCode);
   return product?.relatedProducts?.edges?.map(edge => edge.node) || [];
 };
 

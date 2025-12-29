@@ -67,11 +67,11 @@ Add this to your BigCommerce theme template (before closing `</body>`):
 
 <!-- Initial Data Injection -->
 <script>
-  window.initialData = {
+  window.cm_nb_ra_in_config = {
     token: '{{ settings.storefront_api.token }}',
-    endpoint: "/graphql",
+    endpoint: "/api/proxy-graphql",
     product_id_th: '{{product.id}}',
-    currency_code: "{{ currency_selector.active_currency_code }}",
+    currency_code: "{{ currency_selector.active_currency_code }}"
     mode: 'production' // production | test | development | local
   };
 </script>
@@ -115,7 +115,7 @@ const API_BASE_URLS = {
 };
 ```
 
-The app automatically selects the correct endpoint based on `window.initialData.mode`.
+The app automatically selects the correct endpoint based on `window.cm_nb_ra_in_config.mode`.
 
 ### API Endpoints
 
@@ -212,7 +212,7 @@ To switch to Google Maps:
 ## 🔒 Security
 
 - All API calls use Bearer token authentication
-- Token retrieved from `window.initialData.token`
+- Token retrieved from `window.cm_nb_ra_in_config.token`
 - CORS headers required on backend
 - Input validation on all form fields
 
@@ -233,7 +233,7 @@ Output files:
 
 1. Upload files to WebDAV `/content/` folder
 2. Reference in theme templates
-3. Update `mode` in `window.initialData` to `production`
+3. Update `mode` in `window.cm_nb_ra_in_config` to `production`
 
 ## 🧪 Testing
 
@@ -278,7 +278,7 @@ export const checkZipcode = async (zipcode) => {
 - Check console for errors
 
 **API calls fail:**
-- Verify `window.initialData.mode` is set correctly
+- Verify `window.cm_nb_ra_in_config.mode` is set correctly
 - Check CORS headers on backend
 - Verify Bearer token is valid
 

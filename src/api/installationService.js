@@ -24,7 +24,7 @@ export const checkZipcodeByAPI = async (zipcode) => {
   }
 
   try {
-    const response = await fetch('/api/installers/by-zipcode', {
+    const response = await fetch(getApiUrl('/api/installers/by-zipcode'), {
       method: 'POST',
       headers: {
         ...getAuthHeaders(),
@@ -123,7 +123,7 @@ export const getYears = async () => {
   }
 
   try {
-    const response = await fetch('/api/vehicles/years', {
+    const response = await fetch(getApiUrl('/api/vehicles/years'), {
       method: 'GET',
       headers: {
         ...getAuthHeaders(),
@@ -168,7 +168,7 @@ export const getMakes = async (year) => {
 
   try {
     console.log(`Fetching vehicle makes for year: ${year}`);
-    const response = await fetch(`/api/vehicles/makes?year=${year}`, {
+    const response = await fetch(getApiUrl(`/api/vehicles/makes?year=${year}`), {
       method: 'GET',
       headers: {
         ...getAuthHeaders(),
@@ -224,7 +224,7 @@ export const getModels = async (year, make) => {
     console.log(`Fetching vehicle models for year: ${year} and make: ${make}`);
     // The API expects makeID instead of make name
     // We need to pass the make ID, not the make name
-    const response = await fetch(`/api/vehicles/models?year=${year}&makeID=${make}`, {
+    const response = await fetch(getApiUrl(`/api/vehicles/models?year=${year}&makeID=${make}`), {
       method: 'GET',
       headers: {
         ...getAuthHeaders(),
@@ -276,7 +276,7 @@ export const getTypes = async (model) => {
   }
 
   try {
-    const response = await fetch(`/api/vehicles/types?model=${model}`, {
+    const response = await fetch(getApiUrl(`/api/vehicles/types?model=${model}`), {
       method: 'GET',
       headers: {
         ...getAuthHeaders(),

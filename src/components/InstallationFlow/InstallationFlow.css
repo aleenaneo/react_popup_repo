@@ -34,13 +34,15 @@
 .intro-header p {
     margin: 0;
     font-size: 15px;
-    color: #212529;
+    color: var(--global-secondarydarkest-color);
+    font-family: var(--global-font-family);
     line-height: 1.5;
     max-width: 540px;
 }
 
 .read-more-link {
-    color: #0d6efd;
+    color: var(--global-primary-color);
+    font-family: var(--global-font-family);
     text-decoration: none;
     margin-left: 4px;
 }

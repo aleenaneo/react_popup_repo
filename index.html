@@ -6,6 +6,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BigCommerce Installation Flow</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+       @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+
+:root {
+  --global-primary-color: #6317FF;
+  --global-secondary-color: #000000;
+
+
+  --global-primarydarkest-color: #4718A7;
+  --global-primarydark-color: #5F22DD;
+  --global-primarymedium-color: #804EE9;
+  --global-primarylight-color: #CAB0FF;
+
+
+  --global-secondarydarkest-color: #000000;
+  --global-secondarydark-color: #595959;
+  --global-secondarymedium-color: #A0A0A0;
+  --global-secondarylight-color: #F5F5F5;
+  --global_primarywhite-color: #ffffff;
+
+
+  --global-font-family: 'Inter', sans-serif;
+}
+
+  </style>
   </head>
   <body>
     <!-- Global mounting point for React app -->
@@ -15,11 +42,12 @@
     <script>
       // Environment configuration examples:
       // For development/local testing:
-      window.initialData = {
+      window.cm_nb_ra_in_config = {
         token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJjaWQiOlsxXSwiY29ycyI6WyJodHRwOi8vbG9jYWxob3N0OjMwMDUiLCJodHRwczovL25leHRiYXNlLXNhbmRib3gtMy5teWJpZ2NvbW1lcmNlLmNvbSJdLCJlYXQiOjE4ODU2MzUxNzYsImlhdCI6MTczODc0MDE4OCwiaXNzIjoiQkMiLCJzaWQiOjEwMDI5MDYzNjYsInN1YiI6ImppbTByeDRqanY0OTViNTM5M2h4dGMwMDRvYmlxYzciLCJzdWJfdHlwZSI6MiwidG9rZW5fdHlwZSI6MX0.N2iKlXUumBYO9sFYnWkb1THxtVAnwHsnkol5-IKgMhe2I2MZPoddGVuDU7wzMsR8sF57wL0l2joG490IX4UzCw',
         endpoint: "https://store-5o7xzmxoo0.mybigcommerce.com/graphql",
         product_id_th: '123',
         currency_code: "USD",
+        includeTax: 'true',
         mode: 'development', // production | test | development | local
         programId: 1552,
         product_sku: "NBIQ",  // SKU for GraphQL query
@@ -29,9 +57,9 @@
       
       // For production, uncomment and modify the following:
       /*
-      window.initialData = {
+      window.cm_nb_ra_in_config = {
         token: 'your-production-token',
-        endpoint: "/graphql",
+        endpoint: "https://store-5o7xzmxoo0.mybigcommerce.com/graphql",
         product_id_th: 'your-product-id',
         currency_code: "USD",
         mode: 'production',

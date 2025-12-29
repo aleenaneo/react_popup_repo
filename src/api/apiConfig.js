@@ -10,23 +10,53 @@ const API_BASE_URLS = {
   local: 'http://127.0.0.1:8000'
 };
 
+// GraphQL API endpoints per environment
+const GRAPHQL_ENDPOINTS = {
+  production: 'https://store-5o7xzmxoo0.mybigcommerce.com/graphql',
+  test: 'https://store-5o7xzmxoo0.mybigcommerce.com/graphql',
+  development: 'https://store-5o7xzmxoo0.mybigcommerce.com/graphql',
+  local: 'https://store-5o7xzmxoo0.mybigcommerce.com/graphql'
+};
+
 /**
  * Safely retrieves initial data from window object
  * @returns {Object} Initial data with defaults
  */
 export const getInitialData = () => {
-  if (typeof window === 'undefined' || !window.initialData) {
-    console.warn('window.initialData not found, using defaults');
+  if (typeof window === 'undefined' || !window.cm_nb_ra_in_config) {
+    console.warn('window.cm_nb_ra_in_config not found, using defaults');
     return {
       token: '',
-      endpoint: '/graphql',
+      endpoint: 'https://store-5o7xzmxoo0.mybigcommerce.com/graphql',
       product_id_th: '',
       currency_code: 'USD',
       mode: 'development',
       programId: 1552
     };
   }
-  return window.initialData;
+  return window.cm_nb_ra_in_config;
+};
+
+/**
+ * Gets the GraphQL endpoint based on current mode
+ * @returns {string} GraphQL endpoint URL
+ */
+export const getGraphQlEndpoint = () => {
+  const { mode, endpoint } = getInitialData();
+  
+  // If endpoint is already a full URL, return as is
+  if (endpoint && endpoint.startsWith('http')) {
+    return endpoint;
+  }
+  
+  // Check if we have a specific GraphQL endpoint for this mode
+  if (GRAPHQL_ENDPOINTS[mode]) {
+    return GRAPHQL_ENDPOINTS[mode];
+  }
+  
+  // Fallback: construct with API base URL
+  const baseUrl = getApiBaseUrl();
+  return `${baseUrl}${endpoint}`;
 };
 
 /**
@@ -118,5 +148,6 @@ export default {
   getApiUrl,
   getAuthHeaders,
   getProgramId,
-  getApiConfig
+  getApiConfig,
+  getGraphQlEndpoint
 };

@@ -43,7 +43,7 @@ The app automatically uses mock data in development mode. No backend required!
 To use real API endpoints:
 
 1. Update `src/api/apiConfig.js` with your API URLs
-2. Set `mode: 'production'` in `window.initialData`
+2. Set `mode: 'production'` in `window.cm_nb_ra_in_config`
 3. The app will automatically switch to real API calls
 
 ## 📦 Build for Production

@@ -55,14 +55,16 @@
     font-size: 18px;
     font-weight: 500;
     /* Regular/Medium per image look */
-    color: #212529;
+    color: var(--global-secondarydarkest-color);
+    font-family: var(--global-font-family);
     line-height: 1.2;
 }
 
 .product-subtitle {
     margin: 4px 0 0 0;
     font-size: 14px;
-    color: #495057;
+    color: var(--global-secondarydarkest-color);
+    font-family: var(--global-font-family);
     font-weight: 400;
 }
 
@@ -77,7 +79,8 @@
 .product-price {
     font-size: 18px;
     font-weight: 700;
-    color: #212529;
+    color: var(--global-secondarydarkest-color);
+    font-family: var(--global-font-family);
 }
 
 .action-button {

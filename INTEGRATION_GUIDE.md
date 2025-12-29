@@ -47,9 +47,9 @@ Add to your theme's `base.html` or `product.html` before `</body>`:
 
 <!-- Initial Data from BigCommerce -->
 <script>
-  window.initialData = {
+  window.cm_nb_ra_in_config = {
     token: '{{ settings.storefront_api.token }}',
-    endpoint: "/graphql",
+    endpoint: "/api/proxy-graphql",
     product_id_th: '{{product.id}}',
     currency_code: "{{ currency_selector.active_currency_code }}",
     mode: 'production'
@@ -272,7 +272,7 @@ app.use(cors({
 
 ### Integration Testing
 - [ ] Upload to BigCommerce
-- [ ] Verify `window.initialData` is populated
+- [ ] Verify `window.cm_nb_ra_in_config` is populated
 - [ ] Test on PDP page
 - [ ] Test on PLP page
 - [ ] Test on Cart page
@@ -281,7 +281,7 @@ app.use(cors({
 
 ### Production Checklist
 - [ ] Update API endpoints to production
-- [ ] Set `mode: 'production'` in initialData
+- [ ] Set `mode: 'production'` in cm_nb_ra_in_config
 - [ ] Test with real product data
 - [ ] Verify cart integration works
 - [ ] Test error handling
@@ -299,7 +299,7 @@ app.use(cors({
 **Solution:**
 - Verify Bearer token is correct
 - Check CORS headers on backend
-- Ensure `window.initialData.token` is set
+- Ensure `window.cm_nb_ra_in_config.token` is set
 
 ### Issue: Map doesn't load
 **Solution:**

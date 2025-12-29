@@ -20,10 +20,9 @@ const ProductBox = ({ product, installationProduct, onToggleInstallation }) => {
       if (product && product.sku) { // assuming product has a sku field
         setLoading(true);
         try {
-          const relatedProductsData = await fetchRelatedProductsBySku(product.sku);
-          
-          // Get preferred SKUs from initial data
           const initialData = getInitialData();
+          // Pass currencyCode to fetchRelatedProductsBySku which will use config value by default
+          const relatedProductsData = await fetchRelatedProductsBySku(product.sku);
           const preferredSkus = initialData.phf_product_skus ? initialData.phf_product_skus.split(',') : [];
           
           // Filter related products to find ones that match the preferred SKUs
@@ -80,7 +79,7 @@ const ProductBox = ({ product, installationProduct, onToggleInstallation }) => {
                       displayProduct?.prices?.basePrice?.value || 
                       displayProduct?.price || 
                       product.price;
-  const currency = displayProduct?.prices?.salePrice?.currencyCode || 
+  const currencyCode = displayProduct?.prices?.salePrice?.currencyCode || 
                   displayProduct?.prices?.basePrice?.currencyCode || 
                   displayProduct?.currency || 
                   product.currency;
@@ -88,6 +87,17 @@ const ProductBox = ({ product, installationProduct, onToggleInstallation }) => {
   // Use related product details if available, otherwise use main product data
   const productName = displayProduct?.name || product.name;
   const productImage = displayProduct?.images?.edges?.[0]?.node?.urlOriginal || displayProduct?.image || product.image;
+
+  // Get currency symbol from initial data (this will need to be updated when we get the symbol from GraphQL)
+  const initialData = getInitialData();
+  const currencySymbolMap = {
+    'USD': '$',
+    'EUR': '€',
+    'GBP': '£',
+    'JPY': '¥',
+    // Add more as needed
+  };
+  const currencySymbol = currencySymbolMap[currencyCode] || currencyCode;
 
   return (
     <div className={`product-box ${isInstallationAdded ? 'selected' : ''}`}>
@@ -115,7 +125,7 @@ const ProductBox = ({ product, installationProduct, onToggleInstallation }) => {
       <div className="product-actions">
         <div className="product-price">
             {/* Price display logic: salePrice.value → basePrice.value → fallback product price */}
-            {loading ? 'Loading...' : `${currency}${displayPrice}`}
+            {loading ? 'Loading...' : `${currencySymbol}${displayPrice}`}
         </div>
         <button 
           className={`action-button ${isInstallationAdded ? 'added' : 'add'}`}
