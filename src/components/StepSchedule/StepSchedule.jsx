@@ -11,20 +11,26 @@ const StepSchedule = ({ onNext, onBack, onClose, initialAppointment = {} }) => {
       : true
   });
 
-  // Calendar State
-  const [currentDate, setCurrentDate] = useState(new Date());
-  
   // Get offset date (start availability from 8 days from now)
   const startDate = new Date();
   startDate.setDate(startDate.getDate() + 8);
   startDate.setHours(0, 0, 0, 0);
+
+  // Availability window: 30 days starting from startDate (inclusive)
+  const availableEndDate = new Date(startDate);
+  availableEndDate.setDate(availableEndDate.getDate() + 29);
+  availableEndDate.setHours(23, 59, 59, 999);
+
+  // Calendar State - default to start month so users see available dates immediately
+  const [currentDate, setCurrentDate] = useState(new Date(startDate));
 
   const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
   const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
 
   const handleDateSelect = (day) => {
     const selected = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-    if (selected >= startDate) {
+    selected.setHours(0, 0, 0, 0);
+    if (selected >= startDate && selected <= availableEndDate) {
       const year = selected.getFullYear();
       const month = String(selected.getMonth() + 1).padStart(2, '0');
       const dateStr = String(day).padStart(2, '0');
@@ -47,8 +53,12 @@ const StepSchedule = ({ onNext, onBack, onClose, initialAppointment = {} }) => {
   };
 
   const changeMonth = (offset) => {
-    const newDate = new Date(currentDate.setMonth(currentDate.getMonth() + offset));
-    setCurrentDate(new Date(newDate));
+    const proposed = new Date(currentDate.getFullYear(), currentDate.getMonth() + offset, 1);
+    const minMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+    const maxMonth = new Date(availableEndDate.getFullYear(), availableEndDate.getMonth(), 1);
+    // prevent navigating outside months that contain available dates
+    if (proposed < minMonth || proposed > maxMonth) return;
+    setCurrentDate(proposed);
   };
 
   const renderCalendar = () => {
@@ -57,6 +67,13 @@ const StepSchedule = ({ onNext, onBack, onClose, initialAppointment = {} }) => {
     const daysInMonth = getDaysInMonth(year, month);
     const firstDay = getFirstDayOfMonth(year, month);
     const monthName = currentDate.toLocaleString('default', { month: 'long' });
+
+    // Limit navigation to months that intersect the availability window
+    const monthStart = new Date(year, month, 1);
+    const minMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+    const maxMonth = new Date(availableEndDate.getFullYear(), availableEndDate.getMonth(), 1);
+    const prevDisabled = monthStart.getTime() <= minMonth.getTime();
+    const nextDisabled = monthStart.getTime() >= maxMonth.getTime();
     
     // Day names
     const days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
@@ -74,7 +91,7 @@ const StepSchedule = ({ onNext, onBack, onClose, initialAppointment = {} }) => {
       const dateToCheck = new Date(year, month, day);
       dateToCheck.setHours(0, 0, 0, 0);
       
-      const isAvailable = dateToCheck >= startDate;
+      const isAvailable = dateToCheck >= startDate && dateToCheck <= availableEndDate;
       
       // Calculate if this date is within the 8-day window before availability
       const endDate = new Date(startDate);
@@ -112,9 +129,9 @@ const StepSchedule = ({ onNext, onBack, onClose, initialAppointment = {} }) => {
     return (
       <div className="calendar-widget">
         <div className="calendar-header">
-          <button onClick={() => changeMonth(-1)}>&lt;</button>
+          <button onClick={() => changeMonth(-1)} disabled={prevDisabled}>&lt;</button>
           <span>{monthName} {year}</span>
-          <button onClick={() => changeMonth(1)}>&gt;</button>
+          <button onClick={() => changeMonth(1)} disabled={nextDisabled}>&gt;</button>
         </div>
         <div className="calendar-weekdays">
           {days.map(d => <div key={d}>{d}</div>)}
@@ -150,6 +167,7 @@ const StepSchedule = ({ onNext, onBack, onClose, initialAppointment = {} }) => {
           {/* Time Slots */}
           <div className="option-group">
             <h4>Select Time</h4>
+            {!appointment.date && <p className="small-note">Select a date to enable available times.</p>}
             <div className="radio-list">
               {TIME_SLOTS.map((slot) => (
                 <label key={slot.id} className="radio-label">
@@ -163,32 +181,6 @@ const StepSchedule = ({ onNext, onBack, onClose, initialAppointment = {} }) => {
                   <span className="radio-text">{slot.label}</span>
                 </label>
               ))}
-            </div>
-          </div>
-
-          {/* Service Preference */}
-          <div className="option-group">
-            <h4>What Would you Like:</h4>
-            <div className="radio-list">
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="vehicleOption"
-                  checked={!appointment.stayWithVehicle}
-                  onChange={() => handleVehicleOptionChange(false)}
-                />
-                <span className="radio-text">Drop off the vehicle</span>
-              </label>
-
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="vehicleOption"
-                  checked={appointment.stayWithVehicle}
-                  onChange={() => handleVehicleOptionChange(true)}
-                />
-                <span className="radio-text">Wait with the vehicle</span>
-              </label>
             </div>
           </div>
         </div>
