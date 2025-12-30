@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getYears, getMakes, getModels, getTypes } from '../../api/installationService';
 import './StepVehicle.css';
 
-const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {}, product, relatedProducts, selectedLocation }) => {
+const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {}, product, relatedProducts, selectedLocation, appointment = {} }) => {
   const [vehicle, setVehicle] = useState({
     year: initialVehicle.year || '',
     make: initialVehicle.make || '',
@@ -203,12 +203,29 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {}, product, re
 
   const handleNext = () => {
     if (vehicle.year && vehicle.make && vehicle.model) {
+      // Build details object with requested fields
+      const extractMake = (m) => {
+        if (!m) return '';
+        if (typeof m === 'object') return m.make || m.name || m.id || m.makeID || '';
+        return m;
+      };
+
+      const details = {
+        year: vehicle.year,
+        make: extractMake(vehicle.make),
+        model: vehicle.model,
+        date: appointment?.date || '',
+        time: appointment?.time || '',
+        memberId: selectedLocation?.member_id || ''
+      };
+
       // Log main product, related products, selected location details, and vehicle details
       console.log('=== VEHICLE STEP CONTINUE BUTTON CLICKED ===');
       console.log('Main Product:', product || 'No product data');
       console.log('Related Products:', relatedProducts || 'No related products');
       console.log('Selected Location Details:', selectedLocation || 'No location selected');
       console.log('Vehicle Details:', vehicle);
+      console.log('Details:', details);
       
       onNext(vehicle);
     }

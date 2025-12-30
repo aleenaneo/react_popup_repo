@@ -169,6 +169,18 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
         });
       }
       
+      // Build a details object to include in metadata (year, make, model, date, time, memberId)
+      const details = {
+        year: vehicle.year,
+        make: typeof vehicle.make === 'object' ? (vehicle.make.make || vehicle.make.name || vehicle.make.id || vehicle.makeID) : vehicle.make,
+        model: vehicle.model,
+        date: flowData.appointment?.date || '',
+        time: flowData.appointment?.time || '',
+        memberId: flowData.appointment?.memberId || flowData.memberId || flowData.selectedLocation?.member_id || ''
+      };
+
+      console.log('Details prepared for metadata:', details);
+
       // Prepare options for related products (same options as main product for now)
       const relatedProductsCartData = relatedProducts.map(relatedProduct => {
         return {
@@ -177,9 +189,10 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
           installationId: null, // Related products don't include installation
           metadata: {
             zipcode: flowData.zipcode,
-            member_id: flowData.appointment.memberId || flowData.memberId,
+            member_id: flowData.appointment?.memberId || flowData.memberId || flowData.selectedLocation?.member_id || '',
             vehicle: vehicle,
-            appointment: flowData.appointment
+            appointment: flowData.appointment,
+            details: details
           }
         };
       });
@@ -191,9 +204,10 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
         installationId: includeInstallation ? installationProduct?.id : null,
         metadata: {
           zipcode: flowData.zipcode,
-          member_id: flowData.appointment.memberId || flowData.memberId,
+          member_id: flowData.appointment?.memberId || flowData.memberId || flowData.selectedLocation?.member_id || '',
           vehicle: vehicle,
-          appointment: flowData.appointment
+          appointment: flowData.appointment,
+          details: details
         }
       });
       
@@ -311,6 +325,7 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
             product={product}
             relatedProducts={relatedProducts}
             selectedLocation={flowData.selectedLocation}
+            appointment={flowData.appointment}
           />
         );
 
