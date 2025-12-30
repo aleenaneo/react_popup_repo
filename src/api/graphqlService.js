@@ -18,6 +18,8 @@ export const executeGraphQLQuery = async (query, variables = {}) => {
   
   // Log the request URL for debugging
   console.log(`GraphQL Request: ${requestUrl}`);
+  console.log(`GraphQL Query:`, query);
+  console.log(`GraphQL Variables:`, variables);
   
   try {
     // For development mode, we might not have a token from BigCommerce
@@ -27,11 +29,13 @@ export const executeGraphQLQuery = async (query, variables = {}) => {
       'Accept': 'application/json'
     };
     
-    // Only add Authorization header if we have a token and we're not using the proxy
-    if (token && !requestUrl.includes('/api/proxy-graphql')) {
+    // Add Authorization header for BigCommerce GraphQL API
+    // In development mode, we're using a proxy to forward requests to BigCommerce
+    if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
     
+    console.log(`GraphQL Request Headers:`, headers);
     const response = await fetch(requestUrl, {
       method: 'POST',
       headers: headers,
@@ -40,12 +44,14 @@ export const executeGraphQLQuery = async (query, variables = {}) => {
         variables
       })
     });
+    console.log(`GraphQL Response Status:`, response.status);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const result = await response.json();
+    console.log(`GraphQL Response Data:`, result);
     
     if (result.errors) {
       console.error('GraphQL errors:', result.errors);
@@ -106,6 +112,7 @@ export const fetchProductBySku = async (sku, currencyCode) => {
           edges {
             node {
               id
+              entityId
               name
               path
               sku
@@ -127,6 +134,23 @@ export const fetchProductBySku = async (sku, currencyCode) => {
                   }
                 }
               }
+                productOptions {
+        edges {
+          node {
+            displayName
+            isVariantOption
+            ... on MultiLineTextFieldOption {
+              defaultValue
+              entityId
+              displayName
+            }
+            ... on TextFieldOption {
+              displayName
+              entityId
+            }
+          }
+        }
+      }
             }
           }
         }
@@ -134,8 +158,10 @@ export const fetchProductBySku = async (sku, currencyCode) => {
     }
   }`;
 
+  console.log(`Fetching product by SKU:`, sku, `with currency code:`, finalCurrencyCode);
   try {
     const data = await executeGraphQLQuery(query);
+    console.log(`Product data fetched:`, data.site.product);
     return data.site.product;
   } catch (error) {
     console.error('Failed to fetch product by SKU:', error);
@@ -153,8 +179,11 @@ export const fetchRelatedProductsBySku = async (sku, currencyCode) => {
   const configCurrencyCode = getInitialData().currency_code || 'USD';
   const finalCurrencyCode = currencyCode || configCurrencyCode;
   
+  console.log(`Fetching related products for SKU:`, sku, `with currency code:`, finalCurrencyCode);
   const product = await fetchProductBySku(sku, finalCurrencyCode);
-  return product?.relatedProducts?.edges?.map(edge => edge.node) || [];
+  const relatedProducts = product?.relatedProducts?.edges?.map(edge => edge.node) || [];
+  console.log(`Related products fetched:`, relatedProducts);
+  return relatedProducts;
 };
 
 export default {

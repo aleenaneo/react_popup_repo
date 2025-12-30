@@ -12,11 +12,20 @@ const StepLocation = ({ locations, onNext, onBack, onClose }) => {
     
     // Scroll to the selected location card after a short delay to ensure DOM update
     setTimeout(() => {
-      if (locationCardRefs.current[memberId] && locationListRef.current) {
-        locationCardRefs.current[memberId].scrollIntoView({
-          behavior: 'smooth',
-          block: 'center'
-        });
+      // Find the first matching location by memberId for scrolling
+      const matchingLocation = locations.find(loc => loc.member_id === memberId);
+      if (matchingLocation && locationListRef.current) {
+        // Find the index of the matching location to construct the correct ref key
+        const matchingIndex = locations.findIndex(loc => loc.member_id === memberId);
+        if (matchingIndex !== -1) {
+          const uniqueKey = `${memberId || 'no-id'}-${matchingIndex}`;
+          if (locationCardRefs.current[uniqueKey]) {
+            locationCardRefs.current[uniqueKey].scrollIntoView({
+              behavior: 'smooth',
+              block: 'center'
+            });
+          }
+        }
       }
     }, 100);
   };
@@ -47,17 +56,17 @@ const StepLocation = ({ locations, onNext, onBack, onClose }) => {
         {/* Location List */}
         <div className="location-list-section" ref={locationListRef}>
           <div className="location-list">
-            {locations.map((location) => (
+            {locations.map((location, index) => (
               <div 
-                key={location.member_id}
-                ref={el => locationCardRefs.current[location.member_id] = el}
+                key={`${location.member_id || 'no-id'}-${index}`}
+                ref={el => locationCardRefs.current[`${location.member_id || 'no-id'}-${index}`] = el}
                 className={`location-card ${selectedMemberId === location.member_id ? 'selected' : ''}`}
                 onClick={() => handleLocationSelect(location.member_id)}
               >
                 <div className="location-info">
                   <h4>{location.city || 'Unknown City'}</h4>
                   {location.address && <p>{location.address}</p>}
-                  {location.distance && <p className="distance-info">Distance: {location.distance}</p>}
+                  {location.distance != null && <p className="distance-info">Distance: {location.distance}</p>}
                 </div>
                 {selectedMemberId === location.member_id && (
                   <div className="selected-indicator">✓</div>

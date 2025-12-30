@@ -5,9 +5,9 @@ import StepZipcode from '../StepZipcode/StepZipcode';
 import StepLocation from '../StepLocation/StepLocation';
 import StepVehicle from '../StepVehicle/StepVehicle';
 import StepSchedule from '../StepSchedule/StepSchedule';
-import { addToCart } from '../../api/installationService';
+import { addToCart, addMultipleToCart } from '../../api/installationService';
 import { getInitialData } from '../../api/apiConfig';
-import { fetchRelatedProductsBySku } from '../../api/graphqlService';
+import { fetchRelatedProductsBySku, fetchProductBySku } from '../../api/graphqlService';
 import './InstallationFlow.css';
 
 const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => {
@@ -117,7 +117,11 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
   const handleScheduleNext = (appointment) => {
     setFlowData(prev => ({
       ...prev,
-      appointment
+      appointment: {
+        ...appointment,
+        // Ensure member_id from location step is preserved
+        memberId: appointment.memberId || flowData.memberId
+      }
     }));
     setCurrentStep('vehicle');
   };
@@ -133,18 +137,71 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
     setError('');
     try {
       const initialData = getInitialData();
-      const cartData = {
+      
+      // Fetch the main product details to get product options
+      const mainProduct = await fetchProductBySku(product?.sku);
+      
+      // Prepare options for main product
+      const mainProductOptions = {};
+      if (mainProduct?.productOptions?.edges) {
+        mainProduct.productOptions.edges.forEach(edge => {
+          const option = edge.node;
+          
+          // Map vehicle data to the appropriate option based on display name
+          if (option.displayName.toLowerCase().includes('vehicle year')) {
+            mainProductOptions[option.entityId] = vehicle.year;
+          } else if (option.displayName.toLowerCase().includes('vehicle make')) {
+            mainProductOptions[option.entityId] = vehicle.make;
+          } else if (option.displayName.toLowerCase().includes('vehicle modal')) { // Note: 'modal' as in your GraphQL response
+            mainProductOptions[option.entityId] = vehicle.model;
+          } else if (option.displayName.toLowerCase().includes('installation date')) {
+            mainProductOptions[option.entityId] = flowData.appointment.date;
+          } else if (option.displayName.toLowerCase().includes('time')) {
+            mainProductOptions[option.entityId] = flowData.appointment.time;
+          } else if (option.displayName.toLowerCase().includes('notes')) {
+            mainProductOptions[option.entityId] = '';
+          } else if (option.displayName.toLowerCase().includes('installer member id')) {
+            mainProductOptions[option.entityId] = flowData.appointment.memberId || flowData.memberId || '';
+          } else {
+            // For any other options, set to empty string
+            mainProductOptions[option.entityId] = '';
+          }
+        });
+      }
+      
+      // Prepare options for related products (same options as main product for now)
+      const relatedProductsCartData = relatedProducts.map(relatedProduct => {
+        return {
+          productId: relatedProduct.id,
+          options: mainProductOptions, // Apply same options as main product
+          installationId: null, // Related products don't include installation
+          metadata: {
+            zipcode: flowData.zipcode,
+            member_id: flowData.appointment.memberId || flowData.memberId,
+            vehicle: vehicle,
+            appointment: flowData.appointment
+          }
+        };
+      });
+      
+      // Add main product with options to cart
+      await addToCart({
         productId: initialData.product_id_th,
+        options: mainProductOptions,
         installationId: includeInstallation ? installationProduct?.id : null,
         metadata: {
           zipcode: flowData.zipcode,
-          member_id: flowData.memberId,
+          member_id: flowData.appointment.memberId || flowData.memberId,
           vehicle: vehicle,
           appointment: flowData.appointment
         }
-      };
-
-      await addToCart(cartData);
+      });
+      
+      // Add related products to cart
+      for (const relatedProductData of relatedProductsCartData) {
+        await addToCart(relatedProductData);
+      }
+      
       alert('Products added to cart successfully with installation details!');
       onClose();
       resetFlow();

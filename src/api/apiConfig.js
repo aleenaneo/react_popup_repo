@@ -4,18 +4,18 @@
  */
 
 const API_BASE_URLS = {
-  production: 'https://your-production-api.com',
+  production: 'https://installer-net.loca.lt',
   test: 'https://your-test-api.com',
-  development: 'http://127.0.0.1:8000',
-  local: 'http://127.0.0.1:8000'
+  development: 'https://installer---net.loca.lt',
+  local: 'https://installer---net.loca.lt'
 };
 
 // GraphQL API endpoints per environment
 const GRAPHQL_ENDPOINTS = {
   production: 'https://store-5o7xzmxoo0.mybigcommerce.com/graphql',
   test: 'https://store-5o7xzmxoo0.mybigcommerce.com/graphql',
-  development: 'https://store-5o7xzmxoo0.mybigcommerce.com/graphql',
-  local: 'https://store-5o7xzmxoo0.mybigcommerce.com/graphql'
+  development: '/graphql', // Use proxy path during development
+  local: '/graphql' // Use proxy path during local development
 };
 
 /**
@@ -24,15 +24,7 @@ const GRAPHQL_ENDPOINTS = {
  */
 export const getInitialData = () => {
   if (typeof window === 'undefined' || !window.cm_nb_ra_in_config) {
-    console.warn('window.cm_nb_ra_in_config not found, using defaults');
-    return {
-      token: '',
-      endpoint: 'https://store-5o7xzmxoo0.mybigcommerce.com/graphql',
-      product_id_th: '',
-      currency_code: 'USD',
-      mode: 'development',
-      programId: 1552
-    };
+    throw new Error('window.cm_nb_ra_in_config not found. Please ensure the configuration is set in index.html before loading the app.');
   }
   return window.cm_nb_ra_in_config;
 };
@@ -44,14 +36,14 @@ export const getInitialData = () => {
 export const getGraphQlEndpoint = () => {
   const { mode, endpoint } = getInitialData();
   
-  // If endpoint is already a full URL, return as is
-  if (endpoint && endpoint.startsWith('http')) {
-    return endpoint;
-  }
-  
   // Check if we have a specific GraphQL endpoint for this mode
   if (GRAPHQL_ENDPOINTS[mode]) {
     return GRAPHQL_ENDPOINTS[mode];
+  }
+  
+  // If endpoint is already a full URL, return as is
+  if (endpoint && endpoint.startsWith('http')) {
+    return endpoint;
   }
   
   // Fallback: construct with API base URL
@@ -142,6 +134,26 @@ export const getApiConfig = () => {
   return config[mode] || config.development;
 };
 
+/**
+ * Gets Google Maps API key from initial data (injected in theme) or Vite env var
+ * @returns {string|null}
+ */
+export const getGoogleMapsApiKey = () => {
+  try {
+    const { googleMapsApiKey } = getInitialData();
+    if (googleMapsApiKey) return googleMapsApiKey;
+  } catch (e) {
+    // window config not present
+  }
+
+  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_GOOGLE_MAPS_API_KEY) {
+    return import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  }
+
+  console.warn('Google Maps API key not found. Google Maps will be disabled.');
+  return null;
+};
+
 export default {
   getInitialData,
   getApiBaseUrl,
@@ -149,5 +161,6 @@ export default {
   getAuthHeaders,
   getProgramId,
   getApiConfig,
-  getGraphQlEndpoint
+  getGraphQlEndpoint,
+  getGoogleMapsApiKey
 };

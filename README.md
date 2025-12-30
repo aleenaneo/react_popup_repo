@@ -200,8 +200,22 @@ Uses **Leaflet** (open-source alternative to Google Maps).
 
 To switch to Google Maps:
 1. Install: `npm install @react-google-maps/api`
-2. Replace `src/components/Map/Map.jsx` with Google Maps implementation
-3. Add Google Maps API key to environment
+2. Add your Google Maps API key - recommended options:
+   - Inject via your theme when embedding the app (preferred for production). Example:
+     ```html
+     <script>
+       window.cm_nb_ra_in_config = {
+         // existing fields ...
+         googleMapsApiKey: 'YOUR_GOOGLE_MAPS_API_KEY',
+         mode: 'production'
+       };
+     </script>
+     ```
+   - Or set a Vite environment variable for local/dev: add to `.env` (not committed):
+     ```env
+     VITE_GOOGLE_MAPS_API_KEY=YOUR_GOOGLE_MAPS_API_KEY
+     ```
+3. The app will automatically use Google Maps if a key is available; otherwise it falls back to Leaflet.
 
 ## 📅 Scheduling
 

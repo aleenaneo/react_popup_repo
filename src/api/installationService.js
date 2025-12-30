@@ -70,14 +70,30 @@ export const checkZipcodeByAPI = async (zipcode) => {
     
     // Transform the response to match expected format
     return {
-      locations: installers.map(installer => ({
-        lat: parseFloat(installer.latitude || installer.lat || 0),
-        lng: parseFloat(installer.longitude || installer.lng || installer.lon || 0),
-        member_id: installer.memberId || installer.member_id || 0,
-        name: installer.companyName || installer.name || 'Unknown Company',
-        distance: installer.distance || 'Unknown Distance',
-        city: installer.city || 'Unknown City'
-      }))
+      locations: installers.map(installer => {
+        // Normalize distance values: if missing use '0 miles', if number append ' miles',
+        // if string without units append ' miles'
+        const rawDistance = installer.distance;
+        let distance = '0 miles';
+        if (rawDistance != null && rawDistance !== '') {
+          if (typeof rawDistance === 'number') {
+            distance = `${rawDistance} miles`;
+          } else if (typeof rawDistance === 'string') {
+            distance = /\d/.test(rawDistance) ? (/mile/i.test(rawDistance) ? rawDistance : `${rawDistance} miles`) : rawDistance;
+          } else {
+            distance = String(rawDistance);
+          }
+        }
+
+        return {
+          lat: parseFloat(installer.latitude || installer.lat || 0),
+          lng: parseFloat(installer.longitude || installer.lng || installer.lon || 0),
+          member_id: installer.memberId || installer.member_id || 0,
+          name: installer.companyName || installer.name || 'Unknown Company',
+          distance,
+          city: installer.city || 'Unknown City'
+        };
+      })
     };
   } catch (error) {
     console.error('Zipcode check by API failed:', error);
@@ -308,10 +324,81 @@ export const addToCart = async (cartData) => {
   }
 
   try {
-    const response = await fetch(getApiUrl('/cart/add'), {
+    // Create URL parameters for options
+    const params = new URLSearchParams();
+    params.append('action', 'add');
+    params.append('product_id', cartData.productId);
+    
+    // Add each option to the URL parameters if options exist
+    if (cartData.options && Object.keys(cartData.options).length > 0) {
+      for (const [key, value] of Object.entries(cartData.options)) {
+        params.append(`attribute[${key}]`, value || '');
+      }
+    }
+    
+    // Add installation ID if provided
+    if (cartData.installationId) {
+      params.append('installation_id', cartData.installationId);
+    }
+    
+    // Add metadata if provided
+    if (cartData.metadata) {
+      for (const [key, value] of Object.entries(cartData.metadata)) {
+        params.append(key, value || '');
+      }
+    }
+    
+    // Construct the cart URL
+    const cartUrl = `/cart.php?${params.toString()}`;
+    
+    // Make the request to add to cart
+    const response = await fetch(getApiUrl(cartUrl), {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify(cartData)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Add to cart failed:', error);
+    throw error;
+  }
+};
+
+/**
+ * Add products to cart with product options
+ * @param {Object} product - Product object with id and options
+ * @param {Object} options - Selected product options
+ * @returns {Promise<Object>} Cart response
+ */
+export const addToCartWithOptions = async (productId, options) => {
+  if (useMockAPI()) {
+    // Mock implementation for testing
+    console.log('Mock add to cart with options:', { productId, options });
+    return { success: true, cartId: 'mock-cart-id' };
+  }
+
+  try {
+    // Construct the URL with product options
+    const params = new URLSearchParams();
+    params.append('action', 'add');
+    params.append('product_id', productId);
+    
+    // Add each option to the URL parameters
+    for (const [key, value] of Object.entries(options)) {
+      params.append(`attribute[${key}]`, value);
+    }
+    
+    // Construct the cart URL
+    const cartUrl = `/cart.php?${params.toString()}`;
+    
+    // Make the request to add to cart
+    const response = await fetch(getApiUrl(cartUrl), {
+      method: 'POST',
+      headers: getAuthHeaders(),
     });
 
     if (!response.ok) {
@@ -320,7 +407,58 @@ export const addToCart = async (cartData) => {
 
     return await response.json();
   } catch (error) {
-    console.error('Add to cart failed:', error);
+    console.error('Add to cart with options failed:', error);
+    throw error;
+  }
+};
+
+/**
+ * Add multiple products to cart with options
+ * @param {Array} productsWithOpts - Array of objects with productId and options
+ * @returns {Promise<Object>} Cart response
+ */
+export const addMultipleToCartWithOptions = async (productsWithOpts) => {
+  if (useMockAPI()) {
+    // Mock implementation for testing
+    console.log('Mock add multiple to cart with options:', productsWithOpts);
+    return { success: true, cartId: 'mock-cart-id' };
+  }
+
+  try {
+    const results = [];
+    for (const item of productsWithOpts) {
+      const result = await addToCartWithOptions(item.productId, item.options);
+      results.push(result);
+    }
+    
+    return { success: true, results };
+  } catch (error) {
+    console.error('Add multiple to cart with options failed:', error);
+    throw error;
+  }
+};
+
+/**
+ * Add multiple products to cart
+ * @param {Array} cartDataArray - Array of cart data objects
+ * @returns {Promise<Object>} Cart response
+ */
+export const addMultipleToCart = async (cartDataArray) => {
+  if (useMockAPI()) {
+    console.log('Mock add multiple to cart:', cartDataArray);
+    return { success: true, cartId: 'mock-cart-id' };
+  }
+
+  try {
+    const results = [];
+    for (const cartData of cartDataArray) {
+      const result = await addToCart(cartData);
+      results.push(result);
+    }
+    
+    return { success: true, results };
+  } catch (error) {
+    console.error('Add multiple to cart failed:', error);
     throw error;
   }
 };

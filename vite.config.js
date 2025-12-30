@@ -15,6 +15,13 @@ export default defineConfig({
         target: 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false
+      },
+      // Proxy for GraphQL requests to BigCommerce
+      '/graphql': {
+        target: BIGCOMMERCE_STORE_URL,
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path
       }
     }
   },

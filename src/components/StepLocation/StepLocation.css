@@ -29,7 +29,8 @@
     padding-right: 4px;
     position: absolute;
     z-index: 1000;
-    background: white;
+    /* Make list container background transparent to show map behind it */
+    background: transparent;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     max-width: 300px;
@@ -59,7 +60,7 @@
 
 .location-card {
     padding: 16px;
-    background: #f8f9fa;
+    background: #f8f9fa54;
     border: 2px solid #e9ecef;
     border-radius: 12px;
     cursor: pointer;
