@@ -38,6 +38,58 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
   const initialData = getInitialData();
   const storeLogo = initialData.store_logo || 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Nextbase_logo.svg/2560px-Nextbase_logo.svg.png'; // fallback to default if not provided
 
+  // Map vehicle/appointment details to product options using phf_mapping configuration
+  const mapDetailsToProductOptions = (mainProduct, details) => {
+    const options = {};
+    
+    if (!mainProduct?.productOptions?.edges) {
+      return options;
+    }
+    
+    // Get the mapping configuration
+    const mappingConfig = window.cm_nb_ra_in_config?.phf_mapping || {};
+    
+    // Map each detail to the corresponding product option based on display name
+    mainProduct.productOptions.edges.forEach(edge => {
+      const option = edge.node;
+      
+      // Look for matching key in phf_mapping
+      let matchedValue = null;
+      for (const [detailKey, displayName] of Object.entries(mappingConfig)) {
+        if (option.displayName.toLowerCase().includes(displayName.toLowerCase())) {
+          // Map the detail value to the option's entityId
+          matchedValue = details[detailKey] || '';
+          break;
+        }
+      }
+      
+      // If no match found in phf_mapping, check for common patterns
+      if (matchedValue === null) {
+        if (option.displayName.toLowerCase().includes('vehicle year')) {
+          matchedValue = details.year || '';
+        } else if (option.displayName.toLowerCase().includes('vehicle make')) {
+          matchedValue = details.make || '';
+        } else if (option.displayName.toLowerCase().includes('vehicle modal')) {
+          matchedValue = details.model || '';
+        } else if (option.displayName.toLowerCase().includes('installation date')) {
+          matchedValue = details.date || '';
+        } else if (option.displayName.toLowerCase().includes('time')) {
+          matchedValue = details.time || '';
+        } else if (option.displayName.toLowerCase().includes('installer member id')) {
+          matchedValue = details.memberId || '';
+        } else {
+          // For any other options, set to empty string
+          matchedValue = '';
+        }
+      }
+      
+      // Use the option's entityId as the key and the matched value
+      options[option.entityId] = matchedValue;
+    });
+    
+    return options;
+  };
+
   // Fetch related products when component mounts
   useEffect(() => {
     if (product && product.sku) {
@@ -141,34 +193,6 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
       // Fetch the main product details to get product options
       const mainProduct = await fetchProductBySku(product?.sku);
       
-      // Prepare options for main product
-      const mainProductOptions = {};
-      if (mainProduct?.productOptions?.edges) {
-        mainProduct.productOptions.edges.forEach(edge => {
-          const option = edge.node;
-          
-          // Map vehicle data to the appropriate option based on display name
-          if (option.displayName.toLowerCase().includes('vehicle year')) {
-            mainProductOptions[option.entityId] = vehicle.year;
-          } else if (option.displayName.toLowerCase().includes('vehicle make')) {
-            mainProductOptions[option.entityId] = vehicle.make;
-          } else if (option.displayName.toLowerCase().includes('vehicle modal')) { // Note: 'modal' as in your GraphQL response
-            mainProductOptions[option.entityId] = vehicle.model;
-          } else if (option.displayName.toLowerCase().includes('installation date')) {
-            mainProductOptions[option.entityId] = flowData.appointment.date;
-          } else if (option.displayName.toLowerCase().includes('time')) {
-            mainProductOptions[option.entityId] = flowData.appointment.time;
-          } else if (option.displayName.toLowerCase().includes('notes')) {
-            mainProductOptions[option.entityId] = '';
-          } else if (option.displayName.toLowerCase().includes('installer member id')) {
-            mainProductOptions[option.entityId] = flowData.appointment.memberId || flowData.memberId || '';
-          } else {
-            // For any other options, set to empty string
-            mainProductOptions[option.entityId] = '';
-          }
-        });
-      }
-      
       // Build a details object to include in metadata (year, make, model, date, time, memberId)
       const details = {
         year: vehicle.year,
@@ -179,13 +203,28 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
         memberId: flowData.appointment?.memberId || flowData.memberId || flowData.selectedLocation?.member_id || ''
       };
 
-      console.log('Details prepared for metadata:', details);
+      console.log('Details prepared for mapping:', details);
+      
+      // Prepare options for main product using the mapping function (for reference)
+      const mainProductOptions = mapDetailsToProductOptions(mainProduct, details);
+      
+      console.log('Main product options after mapping:', mainProductOptions);
 
-      // Prepare options for related products (same options as main product for now)
+      // Prepare options for related products
       const relatedProductsCartData = relatedProducts.map(relatedProduct => {
+        // For related products, use their specific product options
+        const relatedProductId = relatedProduct.entityId || relatedProduct.id;
+        if (!relatedProductId) {
+          console.warn('No valid product ID found for related product:', relatedProduct);
+          return null; // Skip this product
+        }
+        
+        // Map details to this specific related product's options
+        const relatedProductOptions = mapDetailsToProductOptions(relatedProduct, details);
+        
         return {
-          productId: relatedProduct.id,
-          options: mainProductOptions, // Apply same options as main product
+          productId: relatedProductId, // Use the related product's entityId, fallback to id
+          options: relatedProductOptions, // Apply mapped options specific to this related product
           installationId: null, // Related products don't include installation
           metadata: {
             zipcode: flowData.zipcode,
@@ -195,28 +234,14 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
             details: details
           }
         };
-      });
+      }).filter(Boolean); // Remove any null entries
       
-      // Add main product with options to cart
-      await addToCart({
-        productId: initialData.product_id_th,
-        options: mainProductOptions,
-        installationId: includeInstallation ? installationProduct?.id : null,
-        metadata: {
-          zipcode: flowData.zipcode,
-          member_id: flowData.appointment?.memberId || flowData.memberId || flowData.selectedLocation?.member_id || '',
-          vehicle: vehicle,
-          appointment: flowData.appointment,
-          details: details
-        }
-      });
-      
-      // Add related products to cart
+      // Add only related products to cart (skip main product)
       for (const relatedProductData of relatedProductsCartData) {
         await addToCart(relatedProductData);
       }
       
-      alert('Products added to cart successfully with installation details!');
+      alert('Related products added to cart successfully with installation details!');
       onClose();
       resetFlow();
     } catch (err) {

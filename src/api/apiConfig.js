@@ -6,8 +6,8 @@
 const API_BASE_URLS = {
   production: 'https://installer-net.loca.lt',
   test: 'https://your-test-api.com',
-  development: 'https://installer---net.loca.lt',
-  local: 'https://installer---net.loca.lt'
+  development: 'https://installer--net.loca.lt',
+  local: 'https://installer--net.loca.lt'
 };
 
 // GraphQL API endpoints per environment

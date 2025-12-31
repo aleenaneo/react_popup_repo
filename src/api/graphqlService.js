@@ -106,6 +106,7 @@ export const fetchProductBySku = async (sku, currencyCode) => {
           }
         }
         id
+        entityId
         sku
         description
         relatedProducts {

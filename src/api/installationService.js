@@ -341,20 +341,40 @@ export const addToCart = async (cartData) => {
       params.append('installation_id', cartData.installationId);
     }
     
-    // Add metadata if provided
+    // Add metadata if provided, but exclude specific fields
     if (cartData.metadata) {
       for (const [key, value] of Object.entries(cartData.metadata)) {
-        params.append(key, value || '');
+        // Skip these metadata fields to avoid adding them to the cart URL
+        if (!['appointment', 'details', 'vehicle', 'zipcode', 'member_id'].includes(key)) {
+          params.append(key, value || '');
+        }
       }
     }
     
-    // Construct the cart URL
+    // Construct the full cart URL with parameters
     const cartUrl = `/cart.php?${params.toString()}`;
     
+    // Log the constructed URL for debugging
+    console.log('Cart request URL:', cartUrl);
+    console.log('Params object:', Object.fromEntries(params.entries()));
+    
     // Make the request to add to cart
-    const response = await fetch(getApiUrl(cartUrl), {
+    // In production, cart operations should go directly to the store
+    const { mode } = getInitialData();
+    let requestUrl;
+    if (mode === 'production') {
+      // Use the store's direct URL for production cart operations
+      requestUrl = `${window.location.origin}${cartUrl}`;
+    } else {
+      // Use the configured API URL for development/testing
+      requestUrl = getApiUrl(cartUrl);
+    }
+    
+    const response = await fetch(requestUrl, {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
     });
     
     if (!response.ok) {
@@ -392,13 +412,30 @@ export const addToCartWithOptions = async (productId, options) => {
       params.append(`attribute[${key}]`, value);
     }
     
-    // Construct the cart URL
+    // Construct the full cart URL with parameters
     const cartUrl = `/cart.php?${params.toString()}`;
     
+    // Log the request for debugging
+    console.log('Cart request URL:', cartUrl);
+    console.log('Params object:', Object.fromEntries(params.entries()));
+    
     // Make the request to add to cart
-    const response = await fetch(getApiUrl(cartUrl), {
+    // In production, cart operations should go directly to the store
+    const { mode } = getInitialData();
+    let requestUrl;
+    if (mode === 'production') {
+      // Use the store's direct URL for production cart operations
+      requestUrl = `${window.location.origin}${cartUrl}`;
+    } else {
+      // Use the configured API URL for development/testing
+      requestUrl = getApiUrl(cartUrl);
+    }
+    
+    const response = await fetch(requestUrl, {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
     });
 
     if (!response.ok) {
