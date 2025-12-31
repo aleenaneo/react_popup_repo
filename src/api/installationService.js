@@ -336,6 +336,11 @@ export const addToCart = async (cartData) => {
       }
     }
     
+    // If metadata contains zipcode and it's not already in options, add it to attribute 385
+    if (cartData.metadata?.zipcode && !cartData.options?.['385']) {
+      params.append('attribute[385]', cartData.metadata.zipcode);
+    }
+    
     // Add installation ID if provided
     if (cartData.installationId) {
       params.append('installation_id', cartData.installationId);
@@ -410,6 +415,12 @@ export const addToCartWithOptions = async (productId, options) => {
     // Add each option to the URL parameters
     for (const [key, value] of Object.entries(options)) {
       params.append(`attribute[${key}]`, value);
+    }
+    
+    // If options contain zipcode and it's not already in options, add it to attribute 385
+    // This handles the case where the zipcode is provided in the options object
+    if (options['zipcode'] && !options['385']) {
+      params.append('attribute[385]', options['zipcode']);
     }
     
     // Construct the full cart URL with parameters

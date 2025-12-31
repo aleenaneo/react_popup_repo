@@ -77,6 +77,8 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
           matchedValue = details.time || '';
         } else if (option.displayName.toLowerCase().includes('installer member id')) {
           matchedValue = details.memberId || '';
+        } else if (option.displayName.toLowerCase().includes('zip code')) {
+          matchedValue = details.zipcode || '';
         } else {
           // For any other options, set to empty string
           matchedValue = '';
@@ -128,7 +130,9 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
       await addToCart({
         productId: initialData.product_id_th,
         installationId: null,
-        metadata: null
+        metadata: {
+          zipcode: flowData.zipcode
+        }
       });
       alert('Product added to cart successfully!');
       onClose();
@@ -193,14 +197,15 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
       // Fetch the main product details to get product options
       const mainProduct = await fetchProductBySku(product?.sku);
       
-      // Build a details object to include in metadata (year, make, model, date, time, memberId)
+      // Build a details object to include in metadata (year, make, model, date, time, memberId, zipcode)
       const details = {
         year: vehicle.year,
         make: typeof vehicle.make === 'object' ? (vehicle.make.make || vehicle.make.name || vehicle.make.id || vehicle.makeID) : vehicle.make,
         model: vehicle.model,
         date: flowData.appointment?.date || '',
         time: flowData.appointment?.time || '',
-        memberId: flowData.appointment?.memberId || flowData.memberId || flowData.selectedLocation?.member_id || ''
+        memberId: flowData.appointment?.memberId || flowData.memberId || flowData.selectedLocation?.member_id || '',
+        zipcode: flowData.zipcode
       };
 
       console.log('Details prepared for mapping:', details);
@@ -224,7 +229,11 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
         
         return {
           productId: relatedProductId, // Use the related product's entityId, fallback to id
-          options: relatedProductOptions, // Apply mapped options specific to this related product
+          options: {
+            ...relatedProductOptions, // Apply mapped options specific to this related product
+            // Ensure zip code is added as attribute 385 if not already in the mapped options
+            ...(flowData.zipcode && !relatedProductOptions['385'] && { '385': flowData.zipcode })
+          },
           installationId: null, // Related products don't include installation
           metadata: {
             zipcode: flowData.zipcode,
@@ -351,6 +360,7 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
             relatedProducts={relatedProducts}
             selectedLocation={flowData.selectedLocation}
             appointment={flowData.appointment}
+            zipcode={flowData.zipcode}
           />
         );
 

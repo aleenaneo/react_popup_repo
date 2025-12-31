@@ -1,8 +1,12 @@
-import React from 'react';
-import { generateFullCartUrlWithAttributes } from '../../api/installationService';
-import { createAttributeMapping } from '../../utils/helpers';
+import React, { useState, useEffect } from 'react';
+import { generateFullCartUrlWithAttributes } from '../../utils/helpers';
+import { fetchRelatedProductsBySku } from '../../api/graphqlService';
+import { getInitialData } from '../../api/apiConfig';
 
 const CartUrlExample = () => {
+  // State for product ID
+  const [productId, setProductId] = useState(219); // Default to 219 if no related products found
+  
   // Example data
   const exampleVehicle = {
     year: '2003',
@@ -19,11 +23,42 @@ const CartUrlExample = () => {
     member_id: '12345'
   };
   
+  const exampleZipcode = '2024';
+  
   // Create attribute mapping
-  const attributeMapping = createAttributeMapping(exampleVehicle, exampleAppointment, exampleLocation);
+  const attributeMapping = createAttributeMapping(exampleVehicle, exampleAppointment, exampleLocation, exampleZipcode);
+  
+  // Fetch related products and use the first one's entity ID
+  useEffect(() => {
+    const fetchRelatedProduct = async () => {
+      try {
+        const initialData = getInitialData();
+        const productSku = initialData.product_sku;
+        
+        if (productSku) {
+          const relatedProducts = await fetchRelatedProductsBySku(productSku);
+          
+          if (relatedProducts && relatedProducts.length > 0) {
+            // Use the entity ID of the first related product
+            setProductId(relatedProducts[0].entityId);
+            console.log('Using related product entity ID:', relatedProducts[0].entityId);
+          } else {
+            console.log('No related products found, using default ID 219');
+          }
+        } else {
+          console.log('No product SKU found in initial data, using default ID 219');
+        }
+      } catch (error) {
+        console.error('Error fetching related products:', error);
+        // Keep default ID if there's an error
+      }
+    };
+    
+    fetchRelatedProduct();
+  }, []);
   
   // Generate cart URL
-  const cartUrl = generateFullCartUrlWithAttributes(219, attributeMapping);
+  const cartUrl = generateFullCartUrlWithAttributes(productId, attributeMapping);
   
   return (
     <div className="cart-url-example">
@@ -37,6 +72,7 @@ const CartUrlExample = () => {
         <li>382: time</li>
         <li>383: notes</li>
         <li>384: installer member id</li>
+        <li>385: zip code</li>
       </ul>
       
       <p><strong>Selected Values:</strong></p>
@@ -47,6 +83,7 @@ const CartUrlExample = () => {
         <li>Installation Date: {exampleAppointment.date}</li>
         <li>Time: {exampleAppointment.time}</li>
         <li>Installer Member ID: {exampleLocation.member_id}</li>
+        <li>Zip Code: {exampleZipcode}</li>
       </ul>
       
       <p><strong>Generated Cart URL:</strong></p>
@@ -55,7 +92,7 @@ const CartUrlExample = () => {
       <p><strong>Decoded URL Parameters:</strong></p>
       <ul>
         <li>action: add</li>
-        <li>product_id: 219</li>
+        <li>product_id: {productId}</li>
         <li>attribute[375]: {exampleVehicle.year}</li>
         <li>attribute[376]: {exampleVehicle.make}</li>
         <li>attribute[377]: {exampleVehicle.model}</li>
@@ -63,6 +100,7 @@ const CartUrlExample = () => {
         <li>attribute[382]: {exampleAppointment.time}</li>
         <li>attribute[383]: (empty)</li>
         <li>attribute[384]: {exampleLocation.member_id}</li>
+        <li>attribute[385]: {exampleZipcode}</li>
       </ul>
     </div>
   );

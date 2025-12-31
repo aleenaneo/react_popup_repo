@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { getYears, getMakes, getModels, getTypes } from '../../api/installationService';
+import { createAttributeMapping, generateFullCartUrlWithAttributes } from '../../utils/helpers';
 import './StepVehicle.css';
 
-const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {}, product, relatedProducts, selectedLocation, appointment = {} }) => {
+const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {}, product, relatedProducts, selectedLocation, appointment = {}, zipcode = '' }) => {
   const [vehicle, setVehicle] = useState({
     year: initialVehicle.year || '',
     make: initialVehicle.make || '',
@@ -227,7 +228,43 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {}, product, re
       console.log('Vehicle Details:', vehicle);
       console.log('Details:', details);
       
-      onNext(vehicle);
+      // Create attribute mapping based on the details
+      const attributeMapping = createAttributeMapping(
+        { year: details.year, make: details.make, model: details.model },
+        { date: details.date, time: details.time },
+        { member_id: details.memberId },
+        zipcode
+      );
+      
+      // Use the related product's entity ID from API response
+      let productId = null;
+      
+      if (relatedProducts && relatedProducts.length > 0) {
+        // Use the entity ID of the first related product as per project specification
+        productId = relatedProducts[0].entityId;
+        console.log('Using related product entity ID:', productId);
+      } else {
+        // Get the main product ID from API configuration
+        const initialData = window.cm_nb_ra_in_config || {};
+        productId = initialData.product_id_th;
+        console.log('Using main product ID from API config:', productId);
+      }
+      
+      // If no product ID is available from API, show error instead of using static fallback
+      if (!productId) {
+        console.error('No product ID available from API configuration or related products');
+        alert('Product configuration error: No product ID available');
+        return; // Exit the function to prevent creating an invalid cart URL
+      }
+      
+      // Generate the full cart URL with attributes
+      const cartUrl = generateFullCartUrlWithAttributes(productId, attributeMapping);
+      
+      console.log('Generated cart URL:', cartUrl);
+      console.log('Attribute mapping:', attributeMapping);
+      
+      // Redirect to the cart URL
+      window.location.href = cartUrl;
     }
   };
 
