@@ -4,10 +4,10 @@
  */
 
 const API_BASE_URLS = {
-  production: 'https://installer-net.loca.lt',
-  test: 'https://your-test-api.com',
-  development: 'https://installer--net.loca.lt',
-  local: 'https://installer--net.loca.lt'
+  production: 'https://fresh-emu-59.loca.lt',
+  test: 'https://fresh-emu-59.loca.lt',
+  development: 'https://installer-----net.loca.lt',
+  local: 'https://installer-----net.loca.lt'
 };
 
 // GraphQL API endpoints per environment
@@ -39,6 +39,11 @@ export const getGraphQlEndpoint = () => {
   // Check if we have a specific GraphQL endpoint for this mode
   if (GRAPHQL_ENDPOINTS[mode]) {
     return GRAPHQL_ENDPOINTS[mode];
+  }
+  
+  // For development and local modes, prioritize the proxy endpoint
+  if (mode === 'development' || mode === 'local') {
+    return GRAPHQL_ENDPOINTS[mode] || '/graphql';
   }
   
   // If endpoint is already a full URL, return as is

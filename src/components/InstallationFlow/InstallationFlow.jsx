@@ -122,24 +122,51 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
   };
 
   const handleContinueWithoutInstallation = async () => {
-    // Add only the main product to cart
-    setLoading(true);
-    setError('');
+    // Create cart URL with product SKU from config
     try {
-      const initialData = getInitialData();
-      await addToCart({
-        productId: initialData.product_id_th,
-        installationId: null,
-        metadata: {
-          zipcode: flowData.zipcode
+      const config = window.cm_nb_ra_in_config || {};
+      
+      // Check if variant_product is set to "yes"
+      const isVariantProduct = config.variant_product === "yes";
+      
+      let productSku;
+      
+      if (isVariantProduct) {
+        // Get the selected SKU from the dropdown
+        const variantSelect = document.getElementById("iq_product_sku_variation");
+        if (variantSelect) {
+          productSku = variantSelect.value;
+          console.log("Using selected variant SKU:", productSku);
+        } else {
+          console.error("Variant product dropdown not found");
+          setError("Configuration error: Variant product dropdown not found");
+          return;
         }
-      });
-      alert('Product added to cart successfully!');
+      } else {
+        // Use the default product SKU from config
+        productSku = config.product_sku;
+      }
+      
+      if (!productSku) {
+        console.error('Product SKU not found in configuration');
+        setError('Configuration error: Product SKU not available');
+        return;
+      }
+      
+      // Create the cart URL with the SKU
+      const cartUrl = `/cart.php?action=add&sku=${encodeURIComponent(productSku)}`;
+      console.log("cartUrl",cartUrl);
+      
+      
+      // Redirect to the cart URL
+      window.location.href = cartUrl;
+      console.log("window.location.href",window.location.href);
+      
+      
+      // Close the modal after redirect
       onClose();
     } catch (err) {
-      setError('Failed to add product to cart. Please try again.');
-    } finally {
-      setLoading(false);
+      setError('Failed to create cart URL. Please try again.');
     }
   };
 
@@ -194,8 +221,19 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
     try {
       const initialData = getInitialData();
       
+      // Get product SKU from config as specified in the requirement
+      const config = window.cm_nb_ra_in_config || {};
+      const productSku = config.product_sku;
+      
+      if (!productSku) {
+        console.error('Product SKU not found in configuration');
+        setError('Configuration error: Product SKU not available');
+        setLoading(false);
+        return;
+      }
+      
       // Fetch the main product details to get product options
-      const mainProduct = await fetchProductBySku(product?.sku);
+      const mainProduct = await fetchProductBySku(productSku);
       
       // Build a details object to include in metadata (year, make, model, date, time, memberId, zipcode)
       const details = {
@@ -210,11 +248,32 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
 
       console.log('Details prepared for mapping:', details);
       
-      // Prepare options for main product using the mapping function (for reference)
+      // Prepare options for main product using the mapping function
       const mainProductOptions = mapDetailsToProductOptions(mainProduct, details);
       
       console.log('Main product options after mapping:', mainProductOptions);
 
+      // Prepare cart data for the main product
+      const mainProductCartData = {
+        productId: mainProduct?.entityId || mainProduct?.id,
+        options: {
+          ...mainProductOptions,
+          // Ensure zip code is added as attribute 385 if not already in the mapped options
+          ...(flowData.zipcode && !mainProductOptions['385'] && { '385': flowData.zipcode })
+        },
+        installationId: null,
+        metadata: {
+          zipcode: flowData.zipcode,
+          member_id: flowData.appointment?.memberId || flowData.memberId || flowData.selectedLocation?.member_id || '',
+          vehicle: vehicle,
+          appointment: flowData.appointment,
+          details: details
+        }
+      };
+      
+      // Add main product to cart
+      await addToCart(mainProductCartData);
+      
       // Prepare options for related products
       const relatedProductsCartData = relatedProducts.map(relatedProduct => {
         // For related products, use their specific product options
@@ -245,12 +304,12 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
         };
       }).filter(Boolean); // Remove any null entries
       
-      // Add only related products to cart (skip main product)
+      // Add related products to cart
       for (const relatedProductData of relatedProductsCartData) {
         await addToCart(relatedProductData);
       }
       
-      alert('Related products added to cart successfully with installation details!');
+      alert('Main product and related products added to cart successfully with vehicle details!');
       onClose();
       resetFlow();
     } catch (err) {

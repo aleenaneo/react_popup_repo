@@ -54,7 +54,8 @@
         product_sku: "NBIQ",  // SKU for GraphQL query
         store_logo: "https://cdn11.bigcommerce.com/s-5o7xzmxoo0/images/stencil/250x32/logo_1757415802__32203.original.png",
         phf_product_skus: "NBSFITFRONTREARGIQ,NBSFITFRONTREARSTIQ",
-        phf_mapping: {year: 'vehicle year', make: 'vehicle make', model: 'vehicle modal', date: 'installation date', time: 'time', memberId: 'installer member id', zipcode: 'zip code'}
+        phf_mapping: {year: 'vehicle year', make: 'vehicle make', model: 'vehicle modal', date: 'installation date', time: 'time', memberId: 'installer member id', zipcode: 'zip code'},
+        variant_product: "yes"
       };
       
       // For production, uncomment and modify the following:
@@ -73,6 +74,8 @@
       */
     </script>
     
+    <select id="iq_product_sku_variation" class="cm_variant_select_box cm-variant-select-box  form-select form-select--small selectetBoxWithVariant" required="" style="display: inline-block;">
+                <option selected="" value="NBIQ1KUS">iQ 1K - 1080p</option><option undefined="" value="NBIQ2KUS">iQ 2K - 1440p</option><option undefined="" value="NBIQ4KUS">iQ 4K - 2160p</option></select>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
