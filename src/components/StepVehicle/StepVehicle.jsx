@@ -202,7 +202,7 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {}, product, re
     });
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (vehicle.year && vehicle.make && vehicle.model) {
       // Build details object with requested fields
       const extractMake = (m) => {
@@ -236,35 +236,115 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {}, product, re
         zipcode
       );
       
-      // Use the related product's entity ID from API response
-      let productId = null;
+      // Get the main product SKU with variant product logic
+      const initialData = window.cm_nb_ra_in_config || {};
+      
+      // Check if variant_product is set to "yes"
+      const isVariantProduct = initialData.variant_product === "yes";
+      
+      let mainProductSku;
+      
+      if (isVariantProduct) {
+        // Get the selected SKU from the dropdown
+        const variantSelect = document.getElementById("iq_product_sku_variation");
+        if (variantSelect) {
+          mainProductSku = variantSelect.value;
+          console.log("Using selected variant SKU:", mainProductSku);
+        } else {
+          console.error("Variant product dropdown not found");
+          alert("Configuration error: Variant product dropdown not found");
+          return;
+        }
+      } else {
+        // Use the default product SKU from config
+        mainProductSku = initialData.product_sku;
+      }
+      
+      if (!mainProductSku) {
+        console.error('Main product SKU not found in configuration');
+        alert('Product configuration error: Main product SKU not found');
+        return;
+      }
+      
+      // Get the vehicle-related product ID
+      let vehicleProductId = null;
       
       if (relatedProducts && relatedProducts.length > 0) {
         // Use the entity ID of the first related product as per project specification
-        productId = relatedProducts[0].entityId;
-        console.log('Using related product entity ID:', productId);
+        vehicleProductId = relatedProducts[0].entityId;
+        console.log('Using related product entity ID:', vehicleProductId);
       } else {
-        // Get the main product ID from API configuration
-        const initialData = window.cm_nb_ra_in_config || {};
-        productId = initialData.product_id_th;
-        console.log('Using main product ID from API config:', productId);
+        // Fallback to the product_id_th if no related products found
+        vehicleProductId = initialData.product_id_th;
+        console.log('Using main product ID from API config as vehicle product:', vehicleProductId);
       }
       
-      // If no product ID is available from API, show error instead of using static fallback
-      if (!productId) {
-        console.error('No product ID available from API configuration or related products');
-        alert('Product configuration error: No product ID available');
-        return; // Exit the function to prevent creating an invalid cart URL
+      if (!vehicleProductId) {
+        console.error('No product ID available for vehicle product');
+        alert('Product configuration error: No vehicle product ID available');
+        return;
       }
       
-      // Generate the full cart URL with attributes
-      const cartUrl = generateFullCartUrlWithAttributes(productId, attributeMapping);
+      // Create the main product cart URL with SKU
+      const mainProductCartUrl = `/cart.php?action=add&sku=${encodeURIComponent(mainProductSku)}`;
       
-      console.log('Generated cart URL:', cartUrl);
-      console.log('Attribute mapping:', attributeMapping);
+      console.log('Generated main product cart URL:', mainProductCartUrl);
       
-      // Redirect to the cart URL
-      window.location.href = cartUrl;
+      // For BigCommerce, we need to handle multiple cart additions differently
+      // We'll create a sequence of redirects to add both products
+      
+      // First, construct the URL for the main product
+      const mainProductUrl = new URL(window.location.origin + mainProductCartUrl);
+      
+      // Then, construct the URL for the related product with attributes
+      const relatedProductParams = new URLSearchParams();
+      relatedProductParams.append('action', 'add');
+      relatedProductParams.append('product_id', vehicleProductId);
+      
+      // Add each attribute to the URL
+      for (const [attrId, value] of Object.entries(attributeMapping)) {
+        if (value) { // Only add if value exists
+          relatedProductParams.append(`attribute[${attrId}]`, value);
+        }
+      }
+      
+      const relatedProductCartUrl = `/cart.php?${relatedProductParams.toString()}`;
+      
+      console.log('Generated main product cart URL:', mainProductCartUrl);
+      console.log('Generated related product cart URL:', relatedProductCartUrl);
+      
+      // Create an array of cart URLs to process
+      const cartUrls = [mainProductCartUrl, relatedProductCartUrl];
+      
+      // Use a for loop with async/await to add each product to the cart
+      for (const url of cartUrls) {
+        try {
+          // Add product to cart using fetch
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Failed to add product to cart: ${response.status}`);
+          }
+          
+          console.log('Product added to cart successfully:', url);
+          
+          // Small delay between requests to ensure proper processing
+          await new Promise(resolve => setTimeout(resolve, 300));
+          
+        } catch (error) {
+          console.error('Error adding product to cart:', error);
+          alert('Failed to add products to cart. Please try again.');
+          return; // Exit if there's an error
+        }
+      }
+      
+      // After all products have been added, reload to the cart page
+      window.location.href = "/cart.php";
     }
   };
 

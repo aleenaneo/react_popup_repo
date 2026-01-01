@@ -209,112 +209,23 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
     setCurrentStep('vehicle');
   };
 
-  const handleVehicleNext = async (vehicle) => {
+  const handleVehicleNext = async (vehicleData) => {
+    // Check if vehicleData is an object with additional data from StepVehicle
+    const vehicle = vehicleData.vehicle || vehicleData; // If vehicleData is just the vehicle object, use it directly
+    
     setFlowData(prev => ({
       ...prev,
       vehicle
     }));
 
-    // Final step: Add to cart with all metadata
-    setLoading(true);
-    setError('');
+    // The StepVehicle component now handles adding products to cart directly
+    // so we just need to close the modal and reset the flow
     try {
-      const initialData = getInitialData();
-      
-      // Get product SKU from config as specified in the requirement
-      const config = window.cm_nb_ra_in_config || {};
-      const productSku = config.product_sku;
-      
-      if (!productSku) {
-        console.error('Product SKU not found in configuration');
-        setError('Configuration error: Product SKU not available');
-        setLoading(false);
-        return;
-      }
-      
-      // Fetch the main product details to get product options
-      const mainProduct = await fetchProductBySku(productSku);
-      
-      // Build a details object to include in metadata (year, make, model, date, time, memberId, zipcode)
-      const details = {
-        year: vehicle.year,
-        make: typeof vehicle.make === 'object' ? (vehicle.make.make || vehicle.make.name || vehicle.make.id || vehicle.makeID) : vehicle.make,
-        model: vehicle.model,
-        date: flowData.appointment?.date || '',
-        time: flowData.appointment?.time || '',
-        memberId: flowData.appointment?.memberId || flowData.memberId || flowData.selectedLocation?.member_id || '',
-        zipcode: flowData.zipcode
-      };
-
-      console.log('Details prepared for mapping:', details);
-      
-      // Prepare options for main product using the mapping function
-      const mainProductOptions = mapDetailsToProductOptions(mainProduct, details);
-      
-      console.log('Main product options after mapping:', mainProductOptions);
-
-      // Prepare cart data for the main product
-      const mainProductCartData = {
-        productId: mainProduct?.entityId || mainProduct?.id,
-        options: {
-          ...mainProductOptions,
-          // Ensure zip code is added as attribute 385 if not already in the mapped options
-          ...(flowData.zipcode && !mainProductOptions['385'] && { '385': flowData.zipcode })
-        },
-        installationId: null,
-        metadata: {
-          zipcode: flowData.zipcode,
-          member_id: flowData.appointment?.memberId || flowData.memberId || flowData.selectedLocation?.member_id || '',
-          vehicle: vehicle,
-          appointment: flowData.appointment,
-          details: details
-        }
-      };
-      
-      // Add main product to cart
-      await addToCart(mainProductCartData);
-      
-      // Prepare options for related products
-      const relatedProductsCartData = relatedProducts.map(relatedProduct => {
-        // For related products, use their specific product options
-        const relatedProductId = relatedProduct.entityId || relatedProduct.id;
-        if (!relatedProductId) {
-          console.warn('No valid product ID found for related product:', relatedProduct);
-          return null; // Skip this product
-        }
-        
-        // Map details to this specific related product's options
-        const relatedProductOptions = mapDetailsToProductOptions(relatedProduct, details);
-        
-        return {
-          productId: relatedProductId, // Use the related product's entityId, fallback to id
-          options: {
-            ...relatedProductOptions, // Apply mapped options specific to this related product
-            // Ensure zip code is added as attribute 385 if not already in the mapped options
-            ...(flowData.zipcode && !relatedProductOptions['385'] && { '385': flowData.zipcode })
-          },
-          installationId: null, // Related products don't include installation
-          metadata: {
-            zipcode: flowData.zipcode,
-            member_id: flowData.appointment?.memberId || flowData.memberId || flowData.selectedLocation?.member_id || '',
-            vehicle: vehicle,
-            appointment: flowData.appointment,
-            details: details
-          }
-        };
-      }).filter(Boolean); // Remove any null entries
-      
-      // Add related products to cart
-      for (const relatedProductData of relatedProductsCartData) {
-        await addToCart(relatedProductData);
-      }
-      
-      alert('Main product and related products added to cart successfully with vehicle details!');
+      // Close the modal and reset the flow
       onClose();
       resetFlow();
     } catch (err) {
       setError('Failed to complete checkout. Please try again.');
-      setLoading(false);
     }
   };
 
