@@ -117,7 +117,7 @@ const ProductBox = ({ product, installationProduct, onToggleInstallation }) => {
 
       {/* Details Section */}
       <div className="product-details">
-        <h3 className="product-title">{productName}</h3>
+        <h3 className="product-title">{loading ? 'Loading...' : productName}</h3>
         <p className="product-subtitle">(Includes hardwire kit)</p>
       </div>
 

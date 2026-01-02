@@ -22,6 +22,8 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {}, product, re
     models: false
   });
 
+  const [cartAdded, setCartAdded] = useState(false);
+
   const [errors, setErrors] = useState({});
 
   // Debugging: Log options changes
@@ -204,6 +206,9 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {}, product, re
 
   const handleNext = async () => {
     if (vehicle.year && vehicle.make && vehicle.model) {
+      // Set cart added state immediately to show 'Added...' text
+      setCartAdded(true);
+      
       // Build details object with requested fields
       const extractMake = (m) => {
         if (!m) return '';
@@ -343,8 +348,10 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {}, product, re
         }
       }
       
-      // After all products have been added, reload to the cart page
-      window.location.href = "/cart.php";
+      // After a short delay to show the 'Added...' text, redirect to cart
+      setTimeout(() => {
+        window.location.href = "/cart.php";
+      }, 1000);
     }
   };
 
@@ -477,9 +484,9 @@ const StepVehicle = ({ onNext, onBack, onClose, initialVehicle = {}, product, re
         <button
           className="btn btn-primary btn-continue"
           onClick={handleNext}
-          disabled={!isFormComplete}
+          disabled={!isFormComplete || cartAdded}
         >
-          Continue
+          {cartAdded ? 'Added...' : 'Continue'}
         </button>
       </div>
     </div>
