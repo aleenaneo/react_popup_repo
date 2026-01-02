@@ -52,7 +52,7 @@
 
 .product-title {
     margin: 0;
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 500;
     /* Regular/Medium per image look */
     color: var(--global-secondarydarkest-color);
@@ -62,7 +62,7 @@
 
 .product-subtitle {
     margin: 4px 0 0 0;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--global-secondarydarkest-color);
     font-family: var(--global-font-family);
     font-weight: 400;
@@ -77,8 +77,8 @@
 }
 
 .product-price {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 15px;
+    font-weight: 800;
     color: var(--global-secondarydarkest-color);
     font-family: var(--global-font-family);
 }
@@ -86,7 +86,7 @@
 .action-button {
     padding: 6px 24px;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     border: none;
@@ -96,7 +96,8 @@
 
 .action-button.add {
     background-color: #0d6efd;
-    color: white;
+    color: var(--global_primarywhite-color);
+    font-family: var(--global-font-family);
 }
 
 .action-button.add:hover {
@@ -104,13 +105,14 @@
 }
 
 .action-button.added {
-    background-color: white;
+    background-color: var(--global_primarywhite-color);
+    font-family: var(--global-font-family);
     color: #212529;
     border: 1px solid #6c757d;
     border-radius: 20px;
     padding: 4px 16px;
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 13px;
+    font-weight: 400;
 }
 
 .action-button.added:hover {

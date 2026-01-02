@@ -112,9 +112,25 @@ const InstallationFlow = ({ isOpen, onClose, product, installationProduct }) => 
   // Handle read more link click - use the path of the first related product if available
   const handleReadMoreClick = (e) => {
     e.preventDefault();
+    
+    // Track the click time
+    const clickTime = new Date().toISOString();
+    console.log('Read more link clicked at:', clickTime);
+    
     if (relatedProducts.length > 0 && relatedProducts[0].path) {
       // Navigate to the related product path
       window.open(relatedProducts[0].path, '_blank');
+      
+      // Optionally track the click event with analytics
+      // You can add additional tracking here (e.g., Google Analytics, etc.)
+      if (window.gtag) {
+        window.gtag('event', 'read_more_click', {
+          'event_category': 'Product Interaction',
+          'event_label': relatedProducts[0].name || 'Related Product',
+          'click_time': clickTime,
+          'product_path': relatedProducts[0].path
+        });
+      }
     } else {
       // Fallback behavior if no related product path is available
       console.log('No related product path available');

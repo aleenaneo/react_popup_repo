@@ -11,15 +11,17 @@
 
 .step-schedule .step-header h3 {
     margin: 0 0 12px 0;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 400;
-    color: #212529;
+    color: var(--global-secondarydarkest-color);
+    font-family: var(--global-font-family);
 }
 
 .schedule-note {
     font-size: 12px;
     line-height: 1.4;
-    color: #212529;
+    color: var(--global-secondarydark-color);
+    font-family: var(--global-font-family);
     max-width: 600px;
     margin: 0 auto;
 }
@@ -76,6 +78,12 @@
     cursor: pointer;
 }
 
+.calendar-header button:hover,
+.calendar-header button:focus {
+  background-color: unset !important;
+  
+}
+
 .calendar-header button:disabled {
     opacity: 0.45;
     cursor: default;
@@ -118,7 +126,8 @@
     justify-content: center;
     border-radius: 50%;
     background: transparent;
-    color: #333;
+    color: var(--global-secondarydarkest-color);
+    font-family: var(--global-font-family);
     cursor: pointer;
     transition: all 0.12s ease;
     margin: 0;
@@ -127,14 +136,14 @@
 }
 
 .calendar-day:hover:not(:disabled) {
-    background: #000;
-    color: #fff;
+    background: var(--global-secondarydarkest-color);
+    color: var(--global_primarywhite-color);
     transform: translateY(-1px);
 }
 
 .calendar-day.selected {
-    background: #000;
-    color: #fff;
+    background: var(--global-secondarydarkest-color);
+    color: var(--global_primarywhite-color);
     font-weight: 700;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
     transform: translateY(-1px);
@@ -149,7 +158,8 @@
 
 .calendar-day.eight-day-window {
     background: rgba(0,0,0,0.06);
-    color: #333;
+    color: var(--global-secondarydark-color);
+    font-family: var(--global-font-family);
 }
 
 .calendar-day.empty{
@@ -190,12 +200,13 @@
     align-items: center;
     gap: 10px;
     cursor: pointer;
-    font-size: 15px;
-    color: #333;
+    font-size: 13px;
+    color: var(--global-secondarydarkest-color);
     padding: 6px 0px;
     border-radius: 8px;
     transition: background 0.08s ease, transform 0.05s ease;
     margin-bottom: 0 !important;
+    font-weight: 400;
 }
 
 .radio-label:hover {
@@ -237,7 +248,7 @@
 .small-note {
     margin: 6px 0 8px 0;
     font-size: 12px;
-    color: #6c6c72;
+    color: var(--global-secondarydark-color);
 }
 
 .radio-text {
@@ -256,7 +267,8 @@
 .btn-back {
     border: none !important;
     background: transparent !important;
-    color: #000000 !important;
+    color: var(--global-secondarydarkest-color) !important;
+    font-family: var(--global-font-family);
     padding-left: 6px;
     padding-right: 12px;
     box-shadow: none !important;
@@ -280,8 +292,9 @@
 /* Cancel button: ensure visible border */
 .btn-cancel {
     border: 1px solid #ced4da !important;
-    background: white !important;
-    color: #212529 !important;
+    background: var(--global_primarywhite-color) !important;
+    font-family: var(--global-font-family);
+    color: var(--global-secondarydarkest-color) !important;
     padding: 8px 14px;
     border-radius: 6px;
     box-shadow: none !important;

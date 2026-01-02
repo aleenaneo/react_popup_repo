@@ -85,15 +85,17 @@
 
 .location-info h4 {
     margin: 0 0 4px 0;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
-    color: #212529;
+    color: var(--global-secondarydarkest-color);
+    font-family: var(--global-font-family);
 }
 
 .location-info p {
     margin: 0;
-    font-size: 14px;
-    color: #6c757d;
+    font-size: 13px;
+    color: var(--global-secondarydark-color);
+    font-family: var(--global-font-family);
 }
 
 .distance-info {
@@ -107,7 +109,7 @@
     width: 24px;
     height: 24px;
     background: #007bff;
-    color: white;
+    color: var(--global_primarywhite-color);
     border-radius: 50%;
     display: flex;
     align-items: center;

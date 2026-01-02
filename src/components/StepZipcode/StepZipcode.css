@@ -10,15 +10,19 @@
 
 .step-header h3 {
     margin: 0;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 400;
     /* Regular weight based on image */
-    color: #212529;
+    color: var(--global-secondarydarkest-color);
+    font-family: var(--global-font-family);
     line-height: 1.5;
+    display: flex;
+    flex-direction: column;
 }
 
 .header-subtitle {
     font-weight: 400;
+    font-size: 13px;
 }
 
 .zipcode-input-group {
@@ -34,8 +38,8 @@
     border: 1px solid #ced4da;
     border-radius: 4px !important;
     transition: all 0.2s;
-    background: #fff !important;
-    color: #212529 !important;
+    background: var(--global_primarywhite-color) !important;
+    color: var(--global-secondarydarkest-color) !important;
 }
 
 .zipcode-input::placeholder {
@@ -90,7 +94,8 @@
 .btn-primary {
     background: #6200ea !important;
     /* Purple from image check */
-    color: white !important;
+    color: var(--global_primarywhite-color) !important;
+    font-family: var(--global-font-family);
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -98,7 +103,8 @@
 }
 
 .btn-secondary {
-    background: white !important;
+    background: var(--global_primarywhite-color) !important;
+    font-family: var(--global-font-family);
     color: #212529 !important;
     border: 1px solid #ced4da !important;
 }
