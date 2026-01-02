@@ -48,14 +48,8 @@ function App() {
     switch (type) {
       case 'pdp':
         selectors = [
-          '.add-to-cart-button', 
-          '#add-to-cart', 
-          '[data-add-to-cart]',
-          '#form-action-addToCart',
+      
           '.cm_variant_main_add_to_cart_button',
-          '.iq_buy_button',
-          '.cm-iq-buy-button',
-          '.cm_variant_button_add_to_cart'
         ];
         break;
       case 'plp':
@@ -66,8 +60,6 @@ function App() {
         break;
       default:
         selectors = [
-          '.add-to-cart-button',
-          '#form-action-addToCart',
           '.cm_variant_main_add_to_cart_button'
         ];
     }

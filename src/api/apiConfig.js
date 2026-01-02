@@ -4,7 +4,7 @@
  */
 
 const API_BASE_URLS = {
-  production: 'https://fresh-emu-59.loca.lt',
+  production: 'https://nb-sandbox-installernet-app-815acfea49c1.herokuapp.com/',
   test: 'https://fresh-emu-59.loca.lt',
   development: 'https://installer-----net.loca.lt',
   local: 'https://installer-----net.loca.lt'
@@ -88,9 +88,14 @@ export const getProgramId = () => {
 export const getApiUrl = (path) => {
   // Use the global API_BASE_URL if available, otherwise use the configured base URL
   const baseUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : getApiBaseUrl();
+  
   // Ensure path starts with a slash
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-  const fullUrl = `${baseUrl}${normalizedPath}`;
+  
+  // Remove trailing slash from base URL to prevent double slashes
+  const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  
+  const fullUrl = `${cleanBaseUrl}${normalizedPath}`;
   
   // Log the API URL being used for debugging
   console.log(`API Request: ${fullUrl}`);
@@ -119,19 +124,19 @@ export const getApiConfig = () => {
   
   const config = {
     production: {
-      baseUrl: 'https://your-production-api.com',
+      baseUrl: 'https://nb-sandbox-installernet-app-815acfea49c1.herokuapp.com',
       timeout: 10000
     },
     test: {
-      baseUrl: 'https://your-test-api.com',
+      baseUrl: 'https://fresh-emu-59.loca.lt',
       timeout: 10000
     },
     development: {
-      baseUrl: 'http://127.0.0.1:8000',
+      baseUrl: 'https://installer-----net.loca.lt',
       timeout: 5000
     },
     local: {
-      baseUrl: 'http://127.0.0.1:8000',
+      baseUrl: 'https://installer-----net.loca.lt',
       timeout: 5000
     }
   };
