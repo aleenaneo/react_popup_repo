@@ -163,7 +163,12 @@ export const fetchProductBySku = async (sku, currencyCode) => {
   try {
     const data = await executeGraphQLQuery(query);
     console.log(`Product data fetched:`, data.site.product);
-    return data.site.product;
+      
+    // Add currency info to the product object
+    const product = data.site.product;
+    product.__currencyInfo = data.site.currency;
+      
+    return product;
   } catch (error) {
     console.error('Failed to fetch product by SKU:', error);
     throw error;

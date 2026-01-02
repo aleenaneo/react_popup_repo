@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchRelatedProductsBySku } from '../../api/graphqlService';
+import { fetchRelatedProductsBySku, fetchProductBySku } from '../../api/graphqlService';
 import { getInitialData } from '../../api/apiConfig';
 import './ProductBox.css';
 
@@ -7,6 +7,7 @@ const ProductBox = ({ product, installationProduct, onToggleInstallation }) => {
   const [isInstallationAdded, setIsInstallationAdded] = useState(false);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [currencyInfo, setCurrencyInfo] = useState(null);
   
   const handleToggle = () => {
     const newState = !isInstallationAdded;
@@ -14,15 +15,20 @@ const ProductBox = ({ product, installationProduct, onToggleInstallation }) => {
     onToggleInstallation(newState);
   };
 
-  // Fetch related products using GraphQL when the component mounts
+  // Fetch related products and main product to get currency information using GraphQL when the component mounts
   useEffect(() => {
-    const fetchRelatedProducts = async () => {
+    const fetchProductData = async () => {
       if (product && product.sku) { // assuming product has a sku field
         setLoading(true);
         try {
           const initialData = getInitialData();
-          // Pass currencyCode to fetchRelatedProductsBySku which will use config value by default
-          const relatedProductsData = await fetchRelatedProductsBySku(product.sku);
+          
+          // Fetch main product to get currency information
+          const mainProduct = await fetchProductBySku(product.sku);
+          
+          // Get related products from the main product
+          const relatedProductsData = mainProduct?.relatedProducts?.edges?.map(edge => edge.node) || [];
+          
           const preferredSkus = initialData.phf_product_skus ? initialData.phf_product_skus.split(',') : [];
           
           // Filter related products to find ones that match the preferred SKUs
@@ -41,6 +47,12 @@ const ProductBox = ({ product, installationProduct, onToggleInstallation }) => {
           }
           
           setRelatedProducts(displayProducts);
+          
+          // Store currency information in component state
+          if (mainProduct?.__currencyInfo) {
+            setCurrencyInfo(mainProduct.__currencyInfo);
+          }
+          
           console.log('GraphQL Related Products Data:', relatedProductsData); // Log the fetched data
           console.log('Preferred SKUs:', preferredSkus);
           console.log('Filtered display products:', displayProducts);
@@ -58,7 +70,7 @@ const ProductBox = ({ product, installationProduct, onToggleInstallation }) => {
       }
     };
     
-    fetchRelatedProducts();
+    fetchProductData();
   }, [product]);
 
   if (!product) return null;
@@ -88,16 +100,9 @@ const ProductBox = ({ product, installationProduct, onToggleInstallation }) => {
   const productName = displayProduct?.name || product.name;
   const productImage = displayProduct?.images?.edges?.[0]?.node?.urlOriginal || displayProduct?.image || product.image;
 
-  // Get currency symbol from initial data (this will need to be updated when we get the symbol from GraphQL)
-  const initialData = getInitialData();
-  const currencySymbolMap = {
-    'USD': '$',
-    'EUR': '€',
-    'GBP': '£',
-    'JPY': '¥',
-    // Add more as needed
-  };
-  const currencySymbol = currencySymbolMap[currencyCode] || currencyCode;
+  // Get currency symbol from GraphQL response
+  // Use the dynamically fetched currency symbol from the main product query
+  const currencySymbol = currencyInfo?.display?.symbol || currencyCode;
 
   return (
     <div className={`product-box ${isInstallationAdded ? 'selected' : ''}`}>
